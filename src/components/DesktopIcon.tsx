@@ -1,4 +1,4 @@
-import { type ReactNode, useState, useEffect, useRef } from 'react'
+import { type ReactNode, useState, useEffect, useRef, memo } from 'react'
 
 interface DesktopIconProps {
   icon: ReactNode
@@ -11,7 +11,7 @@ interface DesktopIconProps {
   onPositionChange?: (x: number, y: number) => void
 }
 
-export default function DesktopIcon({ icon, label, onClick, x = 0, y = 0, isSelected: externalSelected, onSelect, onPositionChange }: DesktopIconProps) {
+const DesktopIcon = memo(function DesktopIcon({ icon, label, onClick, x = 0, y = 0, isSelected: externalSelected, onSelect, onPositionChange }: DesktopIconProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [internalSelected, setInternalSelected] = useState(false)
   const [position, setPosition] = useState({ x, y })
@@ -166,5 +166,7 @@ export default function DesktopIcon({ icon, label, onClick, x = 0, y = 0, isSele
       </div>
     </div>
   )
-}
+})
+
+export default DesktopIcon
 

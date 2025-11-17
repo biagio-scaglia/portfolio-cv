@@ -3,8 +3,8 @@ import Window from './Window'
 import Windows7Spinner from './Windows7Spinner'
 import defaultBackground from '../assets/sfondo.jpg'
 
-// Carica dinamicamente tutti i file jpg dalla cartella sfondo
-const backgroundImages = import.meta.glob('../assets/sfondo/*.jpg', { eager: true }) as Record<string, { default: string }>
+// Carica dinamicamente tutti i file jpg dalla cartella sfondo (lazy loading)
+const backgroundImages = import.meta.glob('../assets/sfondo/*.jpg', { eager: false }) as Record<string, () => Promise<{ default: string }>>
 
 interface ImagesWindowProps {
   onClose: () => void
@@ -36,20 +36,20 @@ export default function ImagesWindow({
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  const [loadedBackgrounds, setLoadedBackgrounds] = useState<Array<{ name: string; url: string }>>([
+    { name: 'Sfondo Default', url: defaultBackground }
+  ])
+
   const backgrounds = useMemo(() => {
-    const sfondi = [
-      { name: 'Sfondo Default', url: defaultBackground },
-    ]
-    
-    // Ordina i file per nome (numerico)
+    // Ordina i file per nome (numerico) - prepara la struttura
     const sortedFiles = Object.entries(backgroundImages)
-      .map(([path, module]) => {
+      .map(([path, loader]) => {
         const fileName = path.split('/').pop()?.replace('.jpg', '') || ''
         const numMatch = fileName.match(/\d+/)
         const num = numMatch ? parseInt(numMatch[0]) : 999
         return {
           path,
-          url: module.default,
+          loader,
           name: fileName,
           num
         }
@@ -63,28 +63,75 @@ export default function ImagesWindow({
         if (a.num !== b.num) return a.num - b.num
         return a.name.localeCompare(b.name)
       })
-      .map((file) => ({
-        name: `Sfondo ${file.name}`,
-        url: file.url
-      }))
     
-    sfondi.push(...sortedFiles)
-    return sfondi
+    // Carica le prime 5 immagini immediatamente, le altre on-demand
+    sortedFiles.slice(0, 5).forEach(async (file) => {
+      try {
+        const module = await file.loader()
+        setLoadedBackgrounds((prev) => {
+          if (!prev.find(bg => bg.name === `Sfondo ${file.name}`)) {
+            return [...prev, { name: `Sfondo ${file.name}`, url: module.default }]
+          }
+          return prev
+        })
+      } catch (error) {
+        console.warn(`Failed to load background: ${file.path}`, error)
+      }
+    })
+    
+    return sortedFiles
+  }, [])
+
+  // Carica le immagini rimanenti quando necessario
+  useEffect(() => {
+    const loadRemainingImages = async () => {
+      const sortedFiles = Object.entries(backgroundImages)
+        .map(([path, loader]) => {
+          const fileName = path.split('/').pop()?.replace('.jpg', '') || ''
+          const numMatch = fileName.match(/\d+/)
+          const num = numMatch ? parseInt(numMatch[0]) : 999
+          return { path, loader, name: fileName, num }
+        })
+        .filter((file) => !file.name.toLowerCase().includes('starter'))
+        .sort((a, b) => {
+          if (a.num !== b.num) return a.num - b.num
+          return a.name.localeCompare(b.name)
+        })
+      
+      // Carica le immagini rimanenti (dalla 6 in poi)
+      for (const file of sortedFiles.slice(5)) {
+        try {
+          const module = await file.loader()
+          setLoadedBackgrounds((prev) => {
+            if (!prev.find(bg => bg.name === `Sfondo ${file.name}`)) {
+              return [...prev, { name: `Sfondo ${file.name}`, url: module.default }]
+            }
+            return prev
+          })
+        } catch (error) {
+          console.warn(`Failed to load background: ${file.path}`, error)
+        }
+      }
+    }
+    
+    // Carica le immagini rimanenti dopo un breve delay
+    const timer = setTimeout(loadRemainingImages, 1000)
+    return () => clearTimeout(timer)
   }, [])
 
   const [selectedBackground, setSelectedBackground] = useState(0)
   
   // Aggiorna lo stato quando cambia currentBackground
   useEffect(() => {
-    const index = backgrounds.findIndex(bg => bg.url === currentBackground)
+    const index = loadedBackgrounds.findIndex(bg => bg.url === currentBackground)
     if (index >= 0) {
       setSelectedBackground(index)
     }
-  }, [currentBackground, backgrounds])
+  }, [currentBackground, loadedBackgrounds])
 
   const handleApply = () => {
-    if (selectedBackground >= 0 && selectedBackground < backgrounds.length) {
-      onBackgroundChange(backgrounds[selectedBackground].url)
+    if (selectedBackground >= 0 && selectedBackground < loadedBackgrounds.length) {
+      onBackgroundChange(loadedBackgrounds[selectedBackground].url)
     }
     if (onSlideshowChange) {
       onSlideshowChange(localSlideshowEnabled, localSlideshowSeconds)
@@ -119,7 +166,7 @@ export default function ImagesWindow({
           gap: windowWidth <= 480 ? '10px' : '16px', 
           marginBottom: windowWidth <= 480 ? '15px' : '20px' 
         }}>
-          {backgrounds.map((bg, index) => (
+          {loadedBackgrounds.map((bg, index) => (
             <div
               key={index}
               onClick={() => setSelectedBackground(index)}
@@ -159,6 +206,7 @@ export default function ImagesWindow({
               <img
                 src={bg.url.startsWith('linear-gradient') ? undefined : bg.url}
                 alt={bg.name}
+                loading="lazy"
                 style={{
                   width: '100%',
                   height: '100%',

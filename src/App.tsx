@@ -1,27 +1,30 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react'
 import Window from './components/Window'
 import DesktopIcon from './components/DesktopIcon'
-import About from './components/About'
-import PersonalInfo from './components/PersonalInfo'
-import WorkExperience from './components/WorkExperience'
-import Skills from './components/Skills'
-import Education from './components/Education'
-import Certifications from './components/Certifications'
-import Note from './components/Note'
 import WelcomeModal from './components/WelcomeModal'
 import BootScreen from './components/BootScreen'
 import StartMenu from './components/StartMenu'
 import ShutdownScreen from './components/ShutdownScreen'
-import DocumentsWindow from './components/DocumentsWindow'
-import ImagesWindow from './components/ImagesWindow'
-import ComputerWindow from './components/ComputerWindow'
-import MusicWindow from './components/MusicWindow'
+import LoadingFallback from './components/LoadingFallback'
 import taskbarIcon from './assets/icona taskbar.png'
 import defaultBackground from './assets/sfondo.jpg'
 import './App.css'
 
-// Carica dinamicamente tutti i file jpg dalla cartella sfondo per lo slideshow
-const backgroundImages = import.meta.glob('./assets/sfondo/*.jpg', { eager: true }) as Record<string, { default: string }>
+// Lazy loading dei componenti delle finestre
+const About = lazy(() => import('./components/About'))
+const PersonalInfo = lazy(() => import('./components/PersonalInfo'))
+const WorkExperience = lazy(() => import('./components/WorkExperience'))
+const Skills = lazy(() => import('./components/Skills'))
+const Education = lazy(() => import('./components/Education'))
+const Certifications = lazy(() => import('./components/Certifications'))
+const Note = lazy(() => import('./components/Note'))
+const DocumentsWindow = lazy(() => import('./components/DocumentsWindow'))
+const ImagesWindow = lazy(() => import('./components/ImagesWindow'))
+const ComputerWindow = lazy(() => import('./components/ComputerWindow'))
+const MusicWindow = lazy(() => import('./components/MusicWindow'))
+
+// Carica dinamicamente tutti i file jpg dalla cartella sfondo per lo slideshow (lazy loading)
+const backgroundImages = import.meta.glob('./assets/sfondo/*.jpg', { eager: false }) as Record<string, () => Promise<{ default: string }>>
 
 function App() {
   const [showBootScreen, setShowBootScreen] = useState(true)
@@ -48,18 +51,19 @@ function App() {
   const [slideshowIntervalSeconds, setSlideshowIntervalSeconds] = useState(5)
   const [, setCurrentSlideshowIndex] = useState(0)
 
-  // Ottieni lista di tutti gli sfondi disponibili (escluso Starter)
-  const allBackgrounds = useMemo(() => {
-    const backgrounds = [defaultBackground]
-    
+  // Ottieni lista di tutti gli sfondi disponibili (escluso Starter) - lazy loading
+  const [allBackgrounds, setAllBackgrounds] = useState<string[]>([defaultBackground])
+  
+  useEffect(() => {
+    // Carica le immagini in modo lazy
     const sortedFiles = Object.entries(backgroundImages)
-      .map(([path, module]) => {
+      .map(([path, loader]) => {
         const fileName = path.split('/').pop()?.replace('.jpg', '') || ''
         const numMatch = fileName.match(/\d+/)
         const num = numMatch ? parseInt(numMatch[0]) : 999
         return {
           path,
-          url: module.default,
+          loader,
           name: fileName,
           num
         }
@@ -72,10 +76,36 @@ function App() {
         if (a.num !== b.num) return a.num - b.num
         return a.name.localeCompare(b.name)
       })
-      .map((file) => file.url)
     
-    backgrounds.push(...sortedFiles)
-    return backgrounds
+    // Pre-carica solo le prime 3 immagini in background
+    sortedFiles.slice(0, 3).forEach((file) => {
+      file.loader().then((module) => {
+        setAllBackgrounds((prev) => {
+          if (!prev.includes(module.default)) {
+            return [...prev, module.default]
+          }
+          return prev
+        })
+      }).catch((error) => {
+        console.warn(`Failed to load background: ${file.path}`, error)
+      })
+    })
+    
+    // Carica le altre immagini progressivamente
+    sortedFiles.slice(3).forEach((file, index) => {
+      setTimeout(() => {
+        file.loader().then((module) => {
+          setAllBackgrounds((prev) => {
+            if (!prev.includes(module.default)) {
+              return [...prev, module.default]
+            }
+            return prev
+          })
+        }).catch((error) => {
+          console.warn(`Failed to load background: ${file.path}`, error)
+        })
+      }, (index + 1) * 500) // Carica ogni 500ms per non sovraccaricare
+    })
   }, [])
   
   // Impostazioni accessibilità
@@ -135,20 +165,25 @@ function App() {
       setCurrentTime(new Date())
     }, 1000)
 
-    // Gestione resize per responsive
+    // Gestione resize per responsive con debounce
+    let resizeTimeout: number
     const handleResize = () => {
-      setIconPositions(getInitialIconPositions())
+      clearTimeout(resizeTimeout)
+      resizeTimeout = window.setTimeout(() => {
+        setIconPositions(getInitialIconPositions())
+      }, 150)
     }
 
-    window.addEventListener('resize', handleResize)
+    window.addEventListener('resize', handleResize, { passive: true })
 
     return () => {
       clearInterval(timer)
+      clearTimeout(resizeTimeout)
       window.removeEventListener('resize', handleResize)
     }
   }, [])
 
-  const toggleWindow = (window: keyof typeof openWindows) => {
+  const toggleWindow = useCallback((window: keyof typeof openWindows) => {
     setOpenWindows((prev) => {
       const isOpen = prev[window]
       // Se la finestra è minimizzata e viene cliccata, riaprila
@@ -167,9 +202,9 @@ function App() {
       // Altrimenti aprila
       return { ...prev, [window]: true }
     })
-  }
+  }, [minimizedWindows])
 
-  const handleTaskbarClick = (window: keyof typeof openWindows) => {
+  const handleTaskbarClick = useCallback((window: keyof typeof openWindows) => {
     // Se la finestra è minimizzata, riaprila
     if (minimizedWindows.has(window)) {
       setMinimizedWindows((prevMin) => {
@@ -186,44 +221,44 @@ function App() {
     }
     // Se la finestra è chiusa, aprila
     setOpenWindows((prev) => ({ ...prev, [window]: true }))
-  }
+  }, [minimizedWindows, openWindows])
 
-  const handleMinimize = (window: keyof typeof openWindows) => {
+  const handleMinimize = useCallback((window: keyof typeof openWindows) => {
     setMinimizedWindows((prev) => {
       const newMin = new Set(prev)
       newMin.add(window)
       return newMin
     })
     // La finestra rimane "aperta" ma viene nascosta
-  }
+  }, [])
 
 
   // Helper per verificare se una finestra è attiva (aperta e non minimizzata)
-  const isWindowActive = (window: keyof typeof openWindows) => {
+  const isWindowActive = useCallback((window: keyof typeof openWindows) => {
     return openWindows[window] && !minimizedWindows.has(window)
-  }
+  }, [openWindows, minimizedWindows])
 
-  const handleDesktopClick = () => {
+  const handleDesktopClick = useCallback(() => {
     setSelectedIcon(null)
-  }
+  }, [])
 
-  const handleIconPositionChange = (iconKey: keyof typeof iconPositions, x: number, y: number) => {
+  const handleIconPositionChange = useCallback((iconKey: keyof typeof iconPositions, x: number, y: number) => {
     setIconPositions((prev) => ({
       ...prev,
       [iconKey]: { x, y },
     }))
-  }
+  }, [])
 
-  const handleBootComplete = (name: string) => {
+  const handleBootComplete = useCallback((name: string) => {
     setUserName(name)
     setShowBootScreen(false)
     // Piccolo delay per assicurarsi che il suono parta
     setTimeout(() => {
       setShowWelcomeModal(true)
     }, 200)
-  }
+  }, [])
 
-  const handleRestart = () => {
+  const handleRestart = useCallback(() => {
     // Reset di tutti gli stati
     setShowBootScreen(true)
     setShowWelcomeModal(false)
@@ -247,7 +282,7 @@ function App() {
     setMinimizedWindows(new Set())
     // Reset posizioni icone
     setIconPositions(getInitialIconPositions())
-  }
+  }, [])
 
   // Applica impostazioni accessibilità
   useEffect(() => {
@@ -385,7 +420,7 @@ function App() {
     return () => clearInterval(interval)
   }, [isSlideshowEnabled, slideshowIntervalSeconds, allBackgrounds])
 
-  const handleSlideshowChange = (enabled: boolean, seconds: number) => {
+  const handleSlideshowChange = useCallback((enabled: boolean, seconds: number) => {
     setIsSlideshowEnabled(enabled)
     setSlideshowIntervalSeconds(seconds)
     
@@ -394,7 +429,7 @@ function App() {
       const currentIndex = allBackgrounds.findIndex(bg => bg === desktopBackground)
       setCurrentSlideshowIndex(currentIndex >= 0 ? currentIndex : 0)
     }
-  }
+  }, [allBackgrounds, desktopBackground])
 
   return (
     <>
@@ -507,7 +542,9 @@ function App() {
           onClose={() => toggleWindow('about')}
           onMinimize={() => handleMinimize('about')}
         >
-          <About />
+          <Suspense fallback={<LoadingFallback />}>
+            <About />
+          </Suspense>
         </Window>
       )}
 
@@ -520,7 +557,9 @@ function App() {
           onClose={() => toggleWindow('personalInfo')}
           onMinimize={() => handleMinimize('personalInfo')}
         >
-          <PersonalInfo />
+          <Suspense fallback={<LoadingFallback />}>
+            <PersonalInfo />
+          </Suspense>
         </Window>
       )}
 
@@ -533,7 +572,9 @@ function App() {
           onClose={() => toggleWindow('workExperience')}
           onMinimize={() => handleMinimize('workExperience')}
         >
-          <WorkExperience />
+          <Suspense fallback={<LoadingFallback />}>
+            <WorkExperience />
+          </Suspense>
         </Window>
       )}
 
@@ -546,7 +587,9 @@ function App() {
           onClose={() => toggleWindow('skills')}
           onMinimize={() => handleMinimize('skills')}
         >
-          <Skills />
+          <Suspense fallback={<LoadingFallback />}>
+            <Skills />
+          </Suspense>
         </Window>
       )}
 
@@ -559,7 +602,9 @@ function App() {
           onClose={() => toggleWindow('education')}
           onMinimize={() => handleMinimize('education')}
         >
-          <Education />
+          <Suspense fallback={<LoadingFallback />}>
+            <Education />
+          </Suspense>
         </Window>
       )}
 
@@ -572,7 +617,9 @@ function App() {
           onClose={() => toggleWindow('certifications')}
           onMinimize={() => handleMinimize('certifications')}
         >
-          <Certifications />
+          <Suspense fallback={<LoadingFallback />}>
+            <Certifications />
+          </Suspense>
         </Window>
       )}
 
@@ -587,37 +634,47 @@ function App() {
           glassFrame={true}
           glassColor="#4a9eff"
         >
-          <Note />
+          <Suspense fallback={<LoadingFallback />}>
+            <Note />
+          </Suspense>
         </Window>
       )}
       {openWindows.documents && !minimizedWindows.has('documents') && (
-        <DocumentsWindow 
-          onClose={() => toggleWindow('documents')} 
-          onMinimize={() => handleMinimize('documents')}
-        />
+        <Suspense fallback={<LoadingFallback />}>
+          <DocumentsWindow 
+            onClose={() => toggleWindow('documents')} 
+            onMinimize={() => handleMinimize('documents')}
+          />
+        </Suspense>
       )}
       {openWindows.images && !minimizedWindows.has('images') && (
-        <ImagesWindow 
-          onClose={() => toggleWindow('images')} 
-          onBackgroundChange={setDesktopBackground}
-          currentBackground={desktopBackground}
-          isSlideshowEnabled={isSlideshowEnabled}
-          slideshowIntervalSeconds={slideshowIntervalSeconds}
-          onSlideshowChange={handleSlideshowChange}
-          onMinimize={() => handleMinimize('images')}
-        />
+        <Suspense fallback={<LoadingFallback />}>
+          <ImagesWindow 
+            onClose={() => toggleWindow('images')} 
+            onBackgroundChange={setDesktopBackground}
+            currentBackground={desktopBackground}
+            isSlideshowEnabled={isSlideshowEnabled}
+            slideshowIntervalSeconds={slideshowIntervalSeconds}
+            onSlideshowChange={handleSlideshowChange}
+            onMinimize={() => handleMinimize('images')}
+          />
+        </Suspense>
       )}
       {openWindows.computer && !minimizedWindows.has('computer') && (
-        <ComputerWindow 
-          onClose={() => toggleWindow('computer')} 
-          onMinimize={() => handleMinimize('computer')}
-        />
+        <Suspense fallback={<LoadingFallback />}>
+          <ComputerWindow 
+            onClose={() => toggleWindow('computer')} 
+            onMinimize={() => handleMinimize('computer')}
+          />
+        </Suspense>
       )}
       {openWindows.music && !minimizedWindows.has('music') && (
-        <MusicWindow 
-          onClose={() => toggleWindow('music')} 
-          onMinimize={() => handleMinimize('music')}
-        />
+        <Suspense fallback={<LoadingFallback />}>
+          <MusicWindow 
+            onClose={() => toggleWindow('music')} 
+            onMinimize={() => handleMinimize('music')}
+          />
+        </Suspense>
       )}
 
       {/* Taskbar Windows 7 */}

@@ -130,6 +130,7 @@ export default function DocumentsWindow({ onClose, onMinimize }: DocumentsWindow
                   <img
                     src={img.src}
                     alt={img.name}
+                    loading="lazy"
                     style={{
                       width: '100%',
                       height: windowWidth <= 480 ? '100px' : '120px',
@@ -195,6 +196,7 @@ export default function DocumentsWindow({ onClose, onMinimize }: DocumentsWindow
                 <img
                   src={selectedImage}
                   alt="Preview"
+                  loading="lazy"
                   style={{
                     maxWidth: '90%',
                     maxHeight: '90%',

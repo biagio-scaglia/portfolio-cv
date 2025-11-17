@@ -1,4 +1,4 @@
-import { type ReactNode, useState, useRef, useEffect } from 'react'
+import { type ReactNode, useState, useRef, useEffect, memo } from 'react'
 
 interface WindowProps {
   title: string
@@ -60,21 +60,34 @@ export default function Window({
   useEffect(() => {
     if (!isDragging || isMaximized) return
 
+    let animationFrameId: number
     const handleMouseMove = (e: MouseEvent) => {
-      setPosition({
-        x: e.clientX - dragOffset.x,
-        y: e.clientY - dragOffset.y,
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
+      
+      animationFrameId = requestAnimationFrame(() => {
+        setPosition({
+          x: e.clientX - dragOffset.x,
+          y: e.clientY - dragOffset.y,
+        })
       })
     }
 
     const handleMouseUp = () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
       setIsDragging(false)
     }
 
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('mouseup', handleMouseUp)
+    window.addEventListener('mousemove', handleMouseMove, { passive: true })
+    window.addEventListener('mouseup', handleMouseUp, { passive: true })
 
     return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
     }
@@ -84,19 +97,25 @@ export default function Window({
   useEffect(() => {
     if (!isResizing || !resizeType) return
 
+    let animationFrameId: number
     const handleMouseMove = (e: MouseEvent) => {
-      const minWidth = 200
-      const minHeight = 150
-      const maxWidth = window.innerWidth - 20
-      const maxHeight = window.innerHeight - 100
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
+      
+      animationFrameId = requestAnimationFrame(() => {
+        const minWidth = 200
+        const minHeight = 150
+        const maxWidth = window.innerWidth - 20
+        const maxHeight = window.innerHeight - 100
 
-      let newWidth = resizeStart.width
-      let newHeight = resizeStart.height
-      let newLeft = resizeStart.left
-      let newTop = resizeStart.top
+        let newWidth = resizeStart.width
+        let newHeight = resizeStart.height
+        let newLeft = resizeStart.left
+        let newTop = resizeStart.top
 
-      const deltaX = e.clientX - resizeStart.x
-      const deltaY = e.clientY - resizeStart.y
+        const deltaX = e.clientX - resizeStart.x
+        const deltaY = e.clientY - resizeStart.y
 
       // Resize da est (destra)
       if (resizeType.includes('e')) {
@@ -129,20 +148,27 @@ export default function Window({
         }
       }
 
-      setCurrentWidth(newWidth)
-      setCurrentHeight(newHeight)
-      setPosition({ x: newLeft, y: newTop })
+        setCurrentWidth(newWidth)
+        setCurrentHeight(newHeight)
+        setPosition({ x: newLeft, y: newTop })
+      })
     }
 
     const handleMouseUp = () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
       setIsResizing(false)
       setResizeType(null)
     }
 
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('mouseup', handleMouseUp)
+    window.addEventListener('mousemove', handleMouseMove, { passive: true })
+    window.addEventListener('mouseup', handleMouseUp, { passive: true })
 
     return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
     }
