@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 
 interface TaskbarThumbnailProps {
-  windowKey: string
   windowTitle: string
   isOpen: boolean
   isMinimized: boolean
@@ -10,12 +9,10 @@ interface TaskbarThumbnailProps {
   onMinimize: () => void
   onThumbnailEnter?: () => void
   onThumbnailLeave?: () => void
-  position: { x: number; y: number }
   buttonRect: DOMRect | null
 }
 
 export default function TaskbarThumbnail({
-  windowKey,
   windowTitle,
   isOpen,
   isMinimized,
@@ -24,7 +21,6 @@ export default function TaskbarThumbnail({
   onMinimize,
   onThumbnailEnter,
   onThumbnailLeave,
-  position,
   buttonRect,
 }: TaskbarThumbnailProps) {
   const thumbnailRef = useRef<HTMLDivElement>(null)
@@ -34,7 +30,6 @@ export default function TaskbarThumbnail({
       const thumbnail = thumbnailRef.current
       const thumbnailRect = thumbnail.getBoundingClientRect()
       const viewportWidth = window.innerWidth
-      const viewportHeight = window.innerHeight
 
       // Posiziona il thumbnail sopra il pulsante
       let left = buttonRect.left + buttonRect.width / 2 - thumbnailRect.width / 2

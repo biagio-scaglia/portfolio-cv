@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Window from './Window'
 import Windows7Spinner from './Windows7Spinner'
 import defaultBackground from '../assets/sfondo.jpg'
@@ -42,8 +42,8 @@ export default function ImagesWindow({
     { name: 'Sfondo Default', url: defaultBackground }
   ])
 
-  const backgrounds = useMemo(() => {
-    // Ordina i file per nome (numerico) - prepara la struttura
+  // Carica le prime 5 immagini immediatamente, le altre on-demand
+  useEffect(() => {
     const sortedFiles = Object.entries(backgroundImages)
       .map(([path, loader]) => {
         const fileName = path.split('/').pop()?.replace('.jpg', '') || ''
@@ -66,7 +66,6 @@ export default function ImagesWindow({
         return a.name.localeCompare(b.name)
       })
     
-    // Carica le prime 5 immagini immediatamente, le altre on-demand
     sortedFiles.slice(0, 5).forEach(async (file) => {
       try {
         const module = await file.loader()
@@ -80,8 +79,6 @@ export default function ImagesWindow({
         console.warn(`Failed to load background: ${file.path}`, error)
       }
     })
-    
-    return sortedFiles
   }, [])
 
   // Carica le immagini rimanenti quando necessario

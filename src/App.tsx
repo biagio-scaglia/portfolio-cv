@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef, lazy, Suspense } from 'react'
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react'
 import Window from './components/Window'
 import DesktopIcon from './components/DesktopIcon'
 import WelcomeModal from './components/WelcomeModal'
@@ -579,31 +579,6 @@ function App() {
     setHoveredTaskbarButton(null)
   }, [])
 
-  // Helper per dimensioni e posizioni responsive delle finestre
-  const getResponsiveWindowProps = useCallback((defaultWidth: number, defaultHeight: number, defaultX: number, defaultY: number) => {
-    const isMobile = window.innerWidth <= 480
-    const isTablet = window.innerWidth <= 768 && window.innerWidth > 480
-    
-    if (isMobile) {
-      return {
-        width: Math.min(defaultWidth, window.innerWidth - 20),
-        height: Math.min(defaultHeight, window.innerHeight - 100),
-        defaultPosition: { x: 10, y: 10 }
-      }
-    } else if (isTablet) {
-      return {
-        width: Math.min(defaultWidth, window.innerWidth - 40),
-        height: Math.min(defaultHeight, window.innerHeight - 80),
-        defaultPosition: { x: 20, y: 20 }
-      }
-    } else {
-      return {
-        width: defaultWidth,
-        height: defaultHeight,
-        defaultPosition: { x: defaultX, y: defaultY }
-      }
-    }
-  }, [])
 
 
   return (
@@ -1648,7 +1623,6 @@ function App() {
       {/* Taskbar Thumbnail */}
       {hoveredTaskbarButton && (
         <TaskbarThumbnail
-          windowKey={hoveredTaskbarButton.window}
           windowTitle={getWindowTitle(hoveredTaskbarButton.window)}
           isOpen={openWindows[hoveredTaskbarButton.window]}
           isMinimized={minimizedWindows.has(hoveredTaskbarButton.window)}
@@ -1673,7 +1647,6 @@ function App() {
           }}
           onThumbnailEnter={handleThumbnailEnter}
           onThumbnailLeave={handleThumbnailLeave}
-          position={{ x: 0, y: 0 }}
           buttonRect={hoveredTaskbarButton.buttonRect}
         />
       )}

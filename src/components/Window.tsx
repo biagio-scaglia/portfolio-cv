@@ -1,4 +1,4 @@
-import { type ReactNode, useState, useRef, useEffect, memo } from 'react'
+import { type ReactNode, useState, useRef, useEffect } from 'react'
 
 interface WindowProps {
   title: string
