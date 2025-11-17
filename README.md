@@ -1,73 +1,123 @@
-# React + TypeScript + Vite
+# Portfolio CV - Windows 7 Style
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Un portfolio interattivo ispirato all'interfaccia Windows 7, costruito con React e TypeScript.
 
-Currently, two official plugins are available:
+## 🌐 Live Demo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+[Visita il sito live](https://biagio-scaglia.github.io/portfolio-cv)
 
-## React Compiler
+## ✨ Caratteristiche
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Interfaccia Windows 7**: Design autentico ispirato a Windows 7 con effetti glass e animazioni
+- **Finestre interattive**: Sistema di finestre con funzionalità di minimizzazione, massimizzazione e ridimensionamento
+- **Slideshow sfondi**: Sistema automatico per cambiare gli sfondi del desktop con controllo personalizzabile
+- **Responsive Design**: Ottimizzato per desktop, tablet e dispositivi mobili
+- **Boot Screen**: Schermata di avvio con animazioni e suoni
+- **Taskbar funzionale**: Barra delle applicazioni con gestione delle finestre aperte
+- **Form contatti**: Form di contatto simulativo integrato
+- **Gestione documenti**: Visualizzazione di PDF e immagini
+- **Player musicale**: Lettore audio integrato
 
-## Expanding the ESLint configuration
+## 🛠️ Tecnologie
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **React 19** con TypeScript
+- **Vite** - Build tool moderno e veloce
+- **7.css** - Framework CSS per Windows 7 UI
+- **Font Awesome** - Icone
+- **Howler.js** - Gestione audio avanzata
+- **GitHub Pages** - Hosting
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 📦 Installazione
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+```bash
+# Clona il repository
+git clone https://github.com/biagio-scaglia/portfolio-cv.git
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Entra nella directory
+cd portfolio-cv
+
+# Installa le dipendenze
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🚀 Script Disponibili
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+# Avvia il server di sviluppo
+npm run dev
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Build per produzione
+npm run build
+
+# Preview del build di produzione
+npm run preview
+
+# Deploy su GitHub Pages
+npm run deploy
 ```
+
+## 📁 Struttura del Progetto
+
+```
+portfolio-cv/
+├── src/
+│   ├── components/       # Componenti React
+│   │   ├── Window.tsx    # Componente finestra base
+│   │   ├── BootScreen.tsx
+│   │   ├── StartMenu.tsx
+│   │   └── ...
+│   ├── assets/           # Risorse (immagini, suoni, PDF)
+│   ├── App.tsx           # Componente principale
+│   └── main.tsx          # Entry point
+├── public/
+└── package.json
+```
+
+## 🎨 Funzionalità Principali
+
+### Finestre
+- Drag & drop per spostare le finestre
+- Ridimensionamento tramite bordi
+- Minimizzazione e ripristino dalla taskbar
+- Massimizzazione a schermo intero
+- Gestione z-index per finestre sovrapposte
+
+### Desktop
+- Icone trascinabili sul desktop
+- Slideshow automatico degli sfondi
+- Selezione manuale degli sfondi
+- Responsive layout per mobile e tablet
+
+### Taskbar
+- Pulsanti per le finestre aperte
+- Indicatore di stato attivo
+- Gestione finestre minimizzate
+- Orologio in tempo reale
+
+## 📱 Responsive
+
+Il progetto è completamente responsive e ottimizzato per:
+- **Desktop**: Layout completo con tutte le funzionalità
+- **Tablet**: Layout adattato con griglia icone
+- **Mobile**: Interfaccia ottimizzata per touch
+
+## 🚢 Deploy
+
+Il progetto è configurato per il deploy automatico su GitHub Pages:
+
+```bash
+npm run deploy
+```
+
+Il sito sarà disponibile su: `https://biagio-scaglia.github.io/portfolio-cv`
+
+## 📝 Licenza
+
+Questo progetto è privato.
+
+## 👤 Autore
+
+**Biagio Scaglia**
+
+- Portfolio: [GitHub Pages](https://biagio-scaglia.github.io/portfolio-cv)
+- GitHub: [@biagio-scaglia](https://github.com/biagio-scaglia)
