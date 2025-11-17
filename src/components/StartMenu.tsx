@@ -11,6 +11,9 @@ import educationIcon from '../assets/icone/formazione.png'
 import noteIcon from '../assets/icone/note.png'
 import immaginiIcon from '../assets/icone/immagini.png'
 import computerIcon from '../assets/icone/computer.png'
+import linkedinIcon from '../assets/icone/linkedin.png'
+import paintIcon from '../assets/icone/paint.png'
+import firefoxIcon from '../assets/icone/firefox.png'
 
 interface StartMenuProps {
   isOpen: boolean
@@ -22,6 +25,7 @@ interface StartMenuProps {
 export default function StartMenu({ isOpen, onClose, onOpenWindow, onShutdown }: StartMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth)
@@ -45,6 +49,24 @@ export default function StartMenu({ isOpen, onClose, onOpenWindow, onShutdown }:
     }
   }, [isOpen, onClose])
 
+  const allApps: Array<{ icon: string; iconSrc?: string; label: string; window: string }> = [
+    { icon: 'image', iconSrc: infoIcon, label: 'Presentazione', window: 'about' },
+    { icon: 'image', iconSrc: userIcon, label: 'Info Personali', window: 'personalInfo' },
+    { icon: 'image', iconSrc: workExperienceIcon, label: 'Esperienze', window: 'workExperience' },
+    { icon: 'image', iconSrc: skillsIcon, label: 'Competenze', window: 'skills' },
+    { icon: 'image', iconSrc: educationIcon, label: 'Formazione', window: 'education' },
+    { icon: 'image', iconSrc: certificationsIcon, label: 'Certificazioni', window: 'certifications' },
+    { icon: 'image', iconSrc: noteIcon, label: 'Note', window: 'note' },
+    { icon: 'image', iconSrc: computerIcon, label: 'Computer', window: 'computer' },
+    { icon: 'image', iconSrc: folderIcon, label: 'Documenti', window: 'documents' },
+    { icon: 'image', iconSrc: immaginiIcon, label: 'Immagini', window: 'images' },
+    { icon: 'image', iconSrc: musicIcon, label: 'Musica', window: 'music' },
+    { icon: 'image', iconSrc: settingsIcon, label: 'Impostazioni', window: 'settings' },
+    { icon: 'image', iconSrc: linkedinIcon, label: 'LinkedIn', window: 'linkedin' },
+    { icon: 'image', iconSrc: paintIcon, label: 'Paint', window: 'paint' },
+    { icon: 'image', iconSrc: firefoxIcon, label: 'Firefox', window: 'browser' },
+  ]
+
   const menuItems: Array<{ icon: string; iconSrc?: string; label: string; window: string }> = [
     { icon: 'image', iconSrc: infoIcon, label: 'Presentazione', window: 'about' },
     { icon: 'image', iconSrc: userIcon, label: 'Info Personali', window: 'personalInfo' },
@@ -61,6 +83,20 @@ export default function StartMenu({ isOpen, onClose, onOpenWindow, onShutdown }:
     { icon: 'image', iconSrc: immaginiIcon, label: 'Immagini', window: 'images' },
     { icon: 'image', iconSrc: musicIcon, label: 'Musica', window: 'music' },
   ]
+
+  // Filtra le app in base alla ricerca
+  const filteredApps = searchQuery.trim() === '' 
+    ? [] 
+    : allApps.filter(app => 
+        app.label.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+
+  // Reset ricerca quando il menu si chiude
+  useEffect(() => {
+    if (!isOpen) {
+      setSearchQuery('')
+    }
+  }, [isOpen])
 
   if (!isOpen) return null
 
@@ -86,6 +122,127 @@ export default function StartMenu({ isOpen, onClose, onOpenWindow, onShutdown }:
         color: '#fff',
       }}
     >
+      {/* Barra di ricerca */}
+      <div style={{ 
+        padding: '12px 16px', 
+        borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+        background: 'rgba(0, 0, 0, 0.2)'
+      }}>
+        <div style={{ 
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          <i className="fas fa-search" style={{ 
+            fontSize: '14px', 
+            color: 'rgba(255, 255, 255, 0.7)',
+            position: 'absolute',
+            left: '10px',
+            pointerEvents: 'none'
+          }}></i>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Cerca programmi e file..."
+            autoFocus={isOpen}
+            style={{
+              width: '100%',
+              padding: '8px 10px 8px 32px',
+              fontSize: windowWidth <= 480 ? '13px' : '12px',
+              background: 'rgba(255, 255, 255, 0.15)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '4px',
+              color: '#fff',
+              fontFamily: 'Segoe UI, Tahoma, sans-serif',
+              outline: 'none',
+              transition: 'all 0.2s',
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)'
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)'
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)'
+            }}
+          />
+        </div>
+        
+        {/* Risultati ricerca */}
+        {searchQuery.trim() !== '' && filteredApps.length > 0 && (
+          <div style={{
+            marginTop: '8px',
+            maxHeight: '200px',
+            overflowY: 'auto',
+            background: 'rgba(0, 0, 0, 0.3)',
+            borderRadius: '4px',
+            padding: '4px 0'
+          }}>
+            {filteredApps.map((app, index) => (
+              <div
+                key={index}
+                onClick={() => {
+                  if (app.window === 'linkedin') {
+                    window.open('https://www.linkedin.com/in/biagio-scaglia/', '_blank')
+                  } else {
+                    onOpenWindow(app.window)
+                  }
+                  onClose()
+                  setSearchQuery('')
+                }}
+                style={{
+                  padding: '10px 16px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  fontSize: '13px',
+                  transition: 'all 0.15s',
+                  background: 'transparent',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent'
+                }}
+              >
+                {app.icon === 'image' && app.iconSrc ? (
+                  <img 
+                    src={app.iconSrc} 
+                    alt={app.label} 
+                    style={{ 
+                      width: '18px', 
+                      height: '18px',
+                      objectFit: 'contain',
+                      display: 'block'
+                    }} 
+                  />
+                ) : (
+                  <i className={app.icon} style={{ fontSize: '18px', width: '28px', textAlign: 'center' }}></i>
+                )}
+                <span>{app.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {searchQuery.trim() !== '' && filteredApps.length === 0 && (
+          <div style={{
+            marginTop: '8px',
+            padding: '12px',
+            textAlign: 'center',
+            color: 'rgba(255, 255, 255, 0.6)',
+            fontSize: '12px',
+            fontStyle: 'italic'
+          }}>
+            Nessun risultato trovato
+          </div>
+        )}
+      </div>
+
       {/* Sezione sinistra - Programmi */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '8px 0', minHeight: 0 }}>
         <div style={{ padding: '8px 16px', fontSize: '11px', color: 'rgba(255, 255, 255, 0.7)', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.5px' }}>

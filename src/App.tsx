@@ -20,6 +20,9 @@ import educationIcon from './assets/icone/formazione.png'
 import noteIcon from './assets/icone/note.png'
 import immaginiIcon from './assets/icone/immagini.png'
 import computerIcon from './assets/icone/computer.png'
+import linkedinIcon from './assets/icone/linkedin.png'
+import paintIcon from './assets/icone/paint.png'
+import firefoxIcon from './assets/icone/firefox.png'
 import defaultBackground from './assets/sfondo.jpg'
 import './App.css'
 
@@ -36,6 +39,8 @@ const ImagesWindow = lazy(() => import('./components/ImagesWindow'))
 const ComputerWindow = lazy(() => import('./components/ComputerWindow'))
 const MusicWindow = lazy(() => import('./components/MusicWindow'))
 const SettingsWindow = lazy(() => import('./components/SettingsWindow'))
+const PaintWindow = lazy(() => import('./components/PaintWindow'))
+const BrowserWindow = lazy(() => import('./components/BrowserWindow'))
 
 // Carica dinamicamente tutti i file jpg dalla cartella sfondo per lo slideshow (lazy loading)
 const backgroundImages = import.meta.glob('./assets/sfondo/*.jpg', { eager: false }) as Record<string, () => Promise<{ default: string }>>
@@ -59,6 +64,8 @@ function App() {
     computer: false,
     music: false,
     settings: false,
+    paint: false,
+    browser: false,
   })
   const [minimizedWindows, setMinimizedWindows] = useState<Set<keyof typeof openWindows>>(new Set())
   const [desktopBackground, setDesktopBackground] = useState(defaultBackground)
@@ -139,7 +146,7 @@ function App() {
     window: keyof typeof openWindows
     buttonRect: DOMRect
   } | null>(null)
-  const getInitialIconPositions = () => {
+  const getInitialIconPositions = useCallback(() => {
     const isMobile = window.innerWidth <= 480
     const isTablet = window.innerWidth <= 768 && window.innerWidth > 480
     
@@ -154,6 +161,9 @@ function App() {
         certifications: { x: 100, y: 180 },
         note: { x: 20, y: 260 },
         settings: { x: 100, y: 260 },
+        linkedin: { x: 20, y: 340 },
+        paint: { x: 100, y: 340 },
+        browser: { x: 20, y: 420 },
       }
     } else if (isTablet) {
       // Tablet: griglia 3 colonne
@@ -166,6 +176,9 @@ function App() {
         certifications: { x: 230, y: 120 },
         note: { x: 30, y: 210 },
         settings: { x: 130, y: 210 },
+        linkedin: { x: 230, y: 210 },
+        paint: { x: 30, y: 300 },
+        browser: { x: 130, y: 300 },
       }
     } else {
       // Desktop: orizzontale
@@ -178,24 +191,27 @@ function App() {
         certifications: { x: 580, y: 30 },
         note: { x: 690, y: 30 },
         settings: { x: 800, y: 30 },
+        linkedin: { x: 910, y: 30 },
+        paint: { x: 1020, y: 30 },
+        browser: { x: 30, y: 130 },
       }
     }
-  }
+  }, [])
 
-  const [iconPositions, setIconPositions] = useState(getInitialIconPositions())
+  const [iconPositions, setIconPositions] = useState(() => getInitialIconPositions())
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date())
     }, 1000)
 
-    // Gestione resize per responsive con debounce
+    // Gestione resize per responsive con debounce ottimizzato
     let resizeTimeout: number
     const handleResize = () => {
       clearTimeout(resizeTimeout)
       resizeTimeout = window.setTimeout(() => {
-      setIconPositions(getInitialIconPositions())
-      }, 150)
+        setIconPositions(getInitialIconPositions())
+      }, 200)
     }
 
     window.addEventListener('resize', handleResize, { passive: true })
@@ -298,7 +314,7 @@ function App() {
     setShowWelcomeModal(false)
     setShowStartMenu(false)
     setShowShutdownScreen(false)
-    setOpenWindows({
+      setOpenWindows({
       about: false,
       personalInfo: false,
       workExperience: false,
@@ -311,6 +327,8 @@ function App() {
       computer: false,
       music: false,
       settings: false,
+      paint: false,
+      browser: false,
     })
     setSelectedIcon(null)
     setDesktopBackground(defaultBackground)
@@ -522,6 +540,8 @@ function App() {
       computer: 'Computer - Informazioni Sistema',
       music: 'Musica',
       settings: 'Impostazioni - Accessibilità',
+      paint: 'Paint',
+      browser: 'Mozilla Firefox',
     }
     return titles[window] || 'Finestra'
   }, [])
@@ -558,6 +578,33 @@ function App() {
     // Chiudi il thumbnail quando si esce
     setHoveredTaskbarButton(null)
   }, [])
+
+  // Helper per dimensioni e posizioni responsive delle finestre
+  const getResponsiveWindowProps = useCallback((defaultWidth: number, defaultHeight: number, defaultX: number, defaultY: number) => {
+    const isMobile = window.innerWidth <= 480
+    const isTablet = window.innerWidth <= 768 && window.innerWidth > 480
+    
+    if (isMobile) {
+      return {
+        width: Math.min(defaultWidth, window.innerWidth - 20),
+        height: Math.min(defaultHeight, window.innerHeight - 100),
+        defaultPosition: { x: 10, y: 10 }
+      }
+    } else if (isTablet) {
+      return {
+        width: Math.min(defaultWidth, window.innerWidth - 40),
+        height: Math.min(defaultHeight, window.innerHeight - 80),
+        defaultPosition: { x: 20, y: 20 }
+      }
+    } else {
+      return {
+        width: defaultWidth,
+        height: defaultHeight,
+        defaultPosition: { x: defaultX, y: defaultY }
+      }
+    }
+  }, [])
+
 
   return (
     <>
@@ -671,6 +718,42 @@ function App() {
         onSelect={() => setSelectedIcon('settings')}
         onPositionChange={(x, y) => handleIconPositionChange('settings', x, y)}
       />
+      {iconPositions.linkedin && (
+        <DesktopIcon
+          icon={<img src={linkedinIcon} alt="LinkedIn" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
+          label="LinkedIn"
+          onClick={() => window.open('https://www.linkedin.com/in/biagio-scaglia/', '_blank')}
+          x={iconPositions.linkedin.x}
+          y={iconPositions.linkedin.y}
+          isSelected={selectedIcon === 'linkedin'}
+          onSelect={() => setSelectedIcon('linkedin')}
+          onPositionChange={(x, y) => handleIconPositionChange('linkedin', x, y)}
+        />
+      )}
+      {iconPositions.paint && (
+        <DesktopIcon
+          icon={<img src={paintIcon} alt="Paint" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
+          label="Paint"
+          onClick={() => toggleWindow('paint')}
+          x={iconPositions.paint.x}
+          y={iconPositions.paint.y}
+          isSelected={selectedIcon === 'paint'}
+          onSelect={() => setSelectedIcon('paint')}
+          onPositionChange={(x, y) => handleIconPositionChange('paint', x, y)}
+        />
+      )}
+      {iconPositions.browser && (
+        <DesktopIcon
+          icon={<img src={firefoxIcon} alt="Firefox" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
+          label="Firefox"
+          onClick={() => toggleWindow('browser')}
+          x={iconPositions.browser.x}
+          y={iconPositions.browser.y}
+          isSelected={selectedIcon === 'browser'}
+          onSelect={() => setSelectedIcon('browser')}
+          onPositionChange={(x, y) => handleIconPositionChange('browser', x, y)}
+        />
+      )}
       {openWindows.about && !minimizedWindows.has('about') && (
         <Window
           title="Presentazione.txt"
@@ -836,6 +919,24 @@ function App() {
           />
         </Suspense>
       )}
+      {openWindows.paint && !minimizedWindows.has('paint') && (
+        <Suspense fallback={<LoadingFallback />}>
+          <PaintWindow 
+            onClose={() => handleClose('paint')} 
+            onMinimize={() => handleMinimize('paint')}
+            icon={<img src={paintIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
+          />
+        </Suspense>
+      )}
+      {openWindows.browser && !minimizedWindows.has('browser') && (
+        <Suspense fallback={<LoadingFallback />}>
+          <BrowserWindow 
+            onClose={() => handleClose('browser')} 
+            onMinimize={() => handleMinimize('browser')}
+            icon={<img src={firefoxIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
+          />
+        </Suspense>
+      )}
 
       {/* Taskbar Windows 7 */}
       <div
@@ -857,6 +958,10 @@ function App() {
           height: window.innerWidth <= 480 ? '50px' : '40px',
           alignItems: 'center',
           width: '100%',
+          overflowX: window.innerWidth <= 480 ? 'auto' : 'visible',
+          overflowY: 'hidden',
+          scrollbarWidth: window.innerWidth <= 480 ? 'thin' : 'none',
+          WebkitOverflowScrolling: 'touch',
         }}
       >
         {/* Start Button Windows 7 - Circolare */}
@@ -883,7 +988,7 @@ function App() {
             width: '45px',
             height: '40px',
             borderRadius: '0',
-            boxShadow: showStartMenu || openWindows.about || openWindows.personalInfo || openWindows.workExperience || openWindows.skills || openWindows.education || openWindows.certifications || openWindows.note || openWindows.documents || openWindows.images || openWindows.computer || openWindows.music || openWindows.settings
+            boxShadow: showStartMenu || openWindows.about || openWindows.personalInfo || openWindows.workExperience || openWindows.skills || openWindows.education || openWindows.certifications || openWindows.note || openWindows.documents || openWindows.images || openWindows.computer || openWindows.music || openWindows.settings || openWindows.paint || openWindows.browser
               ? 'inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 8px rgba(100, 150, 255, 0.4)'
               : 'inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.2)',
             transition: 'all 0.2s',
@@ -1422,6 +1527,94 @@ function App() {
           <img 
             src={settingsIcon} 
             alt="Impostazioni" 
+            style={{ 
+              width: '18px', 
+              height: '18px',
+              objectFit: 'contain',
+              display: 'block',
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+            }} 
+          />
+        </button>
+        <button
+          className={`taskbar-button ${isWindowActive('paint') ? 'is-active' : ''}`}
+          onClick={() => handleTaskbarClick('paint')}
+          onMouseEnter={(e) => handleTaskbarButtonHover('paint', e)}
+          onMouseLeave={handleTaskbarButtonLeave}
+          style={{
+            padding: '4px 12px',
+            fontSize: '11px',
+            border: 'none',
+            background: isWindowActive('paint')
+              ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.3) 100%)'
+              : 'transparent',
+            backdropFilter: isWindowActive('paint') ? 'blur(25px)' : 'none',
+            WebkitBackdropFilter: isWindowActive('paint') ? 'blur(25px)' : 'none',
+            color: '#fff',
+            cursor: 'pointer',
+            fontWeight: isWindowActive('paint') ? 'bold' : 'normal',
+            minWidth: 'auto',
+            width: 'auto',
+            height: '36px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            borderRadius: '2px',
+            margin: '2px',
+            boxShadow: isWindowActive('paint')
+              ? 'inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 0 6px rgba(100, 150, 255, 0.3)'
+              : 'none',
+            transition: 'all 0.2s',
+          }}
+        >
+          <img 
+            src={paintIcon} 
+            alt="Paint" 
+            style={{ 
+              width: '18px', 
+              height: '18px',
+              objectFit: 'contain',
+              display: 'block',
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+            }} 
+          />
+        </button>
+        <button
+          className={`taskbar-button ${isWindowActive('browser') ? 'is-active' : ''}`}
+          onClick={() => handleTaskbarClick('browser')}
+          onMouseEnter={(e) => handleTaskbarButtonHover('browser', e)}
+          onMouseLeave={handleTaskbarButtonLeave}
+          style={{
+            padding: '4px 12px',
+            fontSize: '11px',
+            border: 'none',
+            background: isWindowActive('browser')
+              ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.3) 100%)'
+              : 'transparent',
+            backdropFilter: isWindowActive('browser') ? 'blur(25px)' : 'none',
+            WebkitBackdropFilter: isWindowActive('browser') ? 'blur(25px)' : 'none',
+            color: '#fff',
+            cursor: 'pointer',
+            fontWeight: isWindowActive('browser') ? 'bold' : 'normal',
+            minWidth: 'auto',
+            width: 'auto',
+            height: '36px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            borderRadius: '2px',
+            margin: '2px',
+            boxShadow: isWindowActive('browser')
+              ? 'inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 0 6px rgba(100, 150, 255, 0.3)'
+              : 'none',
+            transition: 'all 0.2s',
+          }}
+        >
+          <img 
+            src={firefoxIcon} 
+            alt="Firefox" 
             style={{ 
               width: '18px', 
               height: '18px',
