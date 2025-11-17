@@ -597,7 +597,7 @@ function App() {
       <div
         className="taskbar"
         style={{
-          position: 'fixed',
+          position: window.innerWidth <= 480 ? 'fixed' : 'absolute',
           bottom: '0',
           left: '0',
           right: '0',

@@ -225,11 +225,12 @@ button:hover:not(:active) {
     right: 0 !important;
     height: 50px !important;
     overflow-x: auto !important;
-    overflow-y: hidden !important;
+    overflow-y: visible !important;
     flex-wrap: nowrap !important;
     padding: 0 !important;
     z-index: 10000 !important;
     width: 100% !important;
+    display: flex !important;
   }
   
   .taskbar > button {
