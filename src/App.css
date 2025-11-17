@@ -156,16 +156,17 @@ button:hover:not(:active) {
   
   /* Icone desktop più piccole */
   .desktop-icon {
-    width: 85px !important;
+    width: 100px !important;
   }
   
   .desktop-icon > div:first-child {
-    width: 40px !important;
-    height: 40px !important;
+    width: 50px !important;
+    height: 50px !important;
   }
   
   .desktop-icon > div:last-child {
-    font-size: 10px !important;
+    font-size: 11px !important;
+    max-width: 100px !important;
   }
 
   /* Taskbar tablet */
@@ -173,6 +174,33 @@ button:hover:not(:active) {
     height: 44px !important;
     flex-wrap: wrap !important;
     overflow-x: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  /* Scrollbar Windows 7 per taskbar tablet */
+  .taskbar::-webkit-scrollbar {
+    height: 8px !important;
+    width: 8px !important;
+  }
+  
+  .taskbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border-radius: 4px !important;
+  }
+  
+  .taskbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3) !important;
+    border-radius: 4px !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  .taskbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5) !important;
+  }
+  
+  .taskbar::-webkit-scrollbar-thumb:active {
+    background: rgba(255, 255, 255, 0.6) !important;
   }
 
   .taskbar-button {
@@ -238,6 +266,33 @@ button:hover:not(:active) {
     z-index: 10000 !important;
     width: 100% !important;
     display: flex !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  /* Scrollbar Windows 7 per taskbar */
+  .taskbar::-webkit-scrollbar {
+    height: 8px !important;
+    width: 8px !important;
+  }
+  
+  .taskbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border-radius: 4px !important;
+  }
+  
+  .taskbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3) !important;
+    border-radius: 4px !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  .taskbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5) !important;
+  }
+  
+  .taskbar::-webkit-scrollbar-thumb:active {
+    background: rgba(255, 255, 255, 0.6) !important;
   }
   
   .taskbar > button {
@@ -270,17 +325,17 @@ button:hover:not(:active) {
   
   /* Icone desktop mobile */
   .desktop-icon {
-    width: 75px !important;
+    width: 90px !important;
   }
   
   .desktop-icon > div:first-child {
-    width: 36px !important;
-    height: 36px !important;
+    width: 44px !important;
+    height: 44px !important;
   }
   
   .desktop-icon > div:last-child {
-    font-size: 9px !important;
-    max-width: 75px !important;
+    font-size: 10px !important;
+    max-width: 90px !important;
     padding: 2px 3px !important;
   }
 

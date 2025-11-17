@@ -169,6 +169,25 @@ function App() {
     })
   }
 
+  const handleTaskbarClick = (window: keyof typeof openWindows) => {
+    // Se la finestra è minimizzata, riaprila
+    if (minimizedWindows.has(window)) {
+      setMinimizedWindows((prevMin) => {
+        const newMin = new Set(prevMin)
+        newMin.delete(window)
+        return newMin
+      })
+      setOpenWindows((prev) => ({ ...prev, [window]: true }))
+      return
+    }
+    // Se la finestra è già aperta e attiva, non fare nulla (rimane aperta)
+    if (openWindows[window] && !minimizedWindows.has(window)) {
+      return
+    }
+    // Se la finestra è chiusa, aprila
+    setOpenWindows((prev) => ({ ...prev, [window]: true }))
+  }
+
   const handleMinimize = (window: keyof typeof openWindows) => {
     setMinimizedWindows((prev) => {
       const newMin = new Set(prev)
@@ -410,7 +429,7 @@ function App() {
       >
       {/* Desktop Icons */}
       <DesktopIcon
-        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '36px' : window.innerWidth <= 768 ? '40px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>📄</span>}
+        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>📄</span>}
         label="Presentazione"
         onClick={() => toggleWindow('about')}
         x={iconPositions.about.x}
@@ -420,7 +439,7 @@ function App() {
         onPositionChange={(x, y) => handleIconPositionChange('about', x, y)}
       />
       <DesktopIcon
-        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '36px' : window.innerWidth <= 768 ? '40px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>👤</span>}
+        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>👤</span>}
         label="Info Personali"
         onClick={() => toggleWindow('personalInfo')}
         x={iconPositions.personalInfo.x}
@@ -430,7 +449,7 @@ function App() {
         onPositionChange={(x, y) => handleIconPositionChange('personalInfo', x, y)}
       />
       <DesktopIcon
-        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '36px' : window.innerWidth <= 768 ? '40px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>💼</span>}
+        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>💼</span>}
         label="Esperienze"
         onClick={() => toggleWindow('workExperience')}
         x={iconPositions.workExperience.x}
@@ -440,7 +459,7 @@ function App() {
         onPositionChange={(x, y) => handleIconPositionChange('workExperience', x, y)}
       />
       <DesktopIcon
-        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '36px' : window.innerWidth <= 768 ? '40px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>⚡</span>}
+        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>⚡</span>}
         label="Competenze"
         onClick={() => toggleWindow('skills')}
         x={iconPositions.skills.x}
@@ -450,7 +469,7 @@ function App() {
         onPositionChange={(x, y) => handleIconPositionChange('skills', x, y)}
       />
       <DesktopIcon
-        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '36px' : window.innerWidth <= 768 ? '40px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>🎓</span>}
+        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>🎓</span>}
         label="Formazione"
         onClick={() => toggleWindow('education')}
         x={iconPositions.education.x}
@@ -460,7 +479,7 @@ function App() {
         onPositionChange={(x, y) => handleIconPositionChange('education', x, y)}
       />
       <DesktopIcon
-        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '36px' : window.innerWidth <= 768 ? '40px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>🏆</span>}
+        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>🏆</span>}
         label="Certificazioni"
         onClick={() => toggleWindow('certifications')}
         x={iconPositions.certifications.x}
@@ -470,7 +489,7 @@ function App() {
         onPositionChange={(x, y) => handleIconPositionChange('certifications', x, y)}
       />
       <DesktopIcon
-        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '36px' : window.innerWidth <= 768 ? '40px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>📝</span>}
+        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>📝</span>}
         label="Note"
         onClick={() => toggleWindow('note')}
         x={iconPositions.note.x}
@@ -669,7 +688,7 @@ function App() {
         <div style={{ width: '1px', background: 'rgba(0, 0, 0, 0.4)', height: '70%', margin: '0 3px' }} />
         <button
           className={`taskbar-button ${isWindowActive('about') ? 'is-active' : ''}`}
-          onClick={() => toggleWindow('about')}
+          onClick={() => handleTaskbarClick('about')}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -701,7 +720,7 @@ function App() {
         </button>
         <button
           className={`taskbar-button ${isWindowActive('personalInfo') ? 'is-active' : ''}`}
-          onClick={() => toggleWindow('personalInfo')}
+          onClick={() => handleTaskbarClick('personalInfo')}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -733,7 +752,7 @@ function App() {
         </button>
         <button
           className={`taskbar-button ${isWindowActive('workExperience') ? 'is-active' : ''}`}
-          onClick={() => toggleWindow('workExperience')}
+          onClick={() => handleTaskbarClick('workExperience')}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -765,7 +784,7 @@ function App() {
         </button>
         <button
           className={`taskbar-button ${isWindowActive('skills') ? 'is-active' : ''}`}
-          onClick={() => toggleWindow('skills')}
+          onClick={() => handleTaskbarClick('skills')}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -797,7 +816,7 @@ function App() {
         </button>
         <button
           className={`taskbar-button ${isWindowActive('education') ? 'is-active' : ''}`}
-          onClick={() => toggleWindow('education')}
+          onClick={() => handleTaskbarClick('education')}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -829,7 +848,7 @@ function App() {
         </button>
         <button
           className={`taskbar-button ${isWindowActive('certifications') ? 'is-active' : ''}`}
-          onClick={() => toggleWindow('certifications')}
+          onClick={() => handleTaskbarClick('certifications')}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -861,7 +880,7 @@ function App() {
         </button>
         <button
           className={`taskbar-button ${isWindowActive('note') ? 'is-active' : ''}`}
-          onClick={() => toggleWindow('note')}
+          onClick={() => handleTaskbarClick('note')}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -893,7 +912,7 @@ function App() {
         </button>
         <button
           className={`taskbar-button ${isWindowActive('music') ? 'is-active' : ''}`}
-          onClick={() => toggleWindow('music')}
+          onClick={() => handleTaskbarClick('music')}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -925,7 +944,7 @@ function App() {
         </button>
         <button
           className={`taskbar-button ${isWindowActive('documents') ? 'is-active' : ''}`}
-          onClick={() => toggleWindow('documents')}
+          onClick={() => handleTaskbarClick('documents')}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -957,7 +976,7 @@ function App() {
         </button>
         <button
           className={`taskbar-button ${isWindowActive('images') ? 'is-active' : ''}`}
-          onClick={() => toggleWindow('images')}
+          onClick={() => handleTaskbarClick('images')}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -989,7 +1008,7 @@ function App() {
         </button>
         <button
           className={`taskbar-button ${isWindowActive('computer') ? 'is-active' : ''}`}
-          onClick={() => toggleWindow('computer')}
+          onClick={() => handleTaskbarClick('computer')}
           style={{
             padding: '4px 12px',
             fontSize: '11px',

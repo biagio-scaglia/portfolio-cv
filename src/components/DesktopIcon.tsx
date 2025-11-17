@@ -135,8 +135,8 @@ export default function DesktopIcon({ icon, label, onClick, x = 0, y = 0, isSele
     >
       <div
         style={{
-          width: window.innerWidth <= 480 ? '36px' : window.innerWidth <= 768 ? '40px' : '48px',
-          height: window.innerWidth <= 480 ? '36px' : window.innerWidth <= 768 ? '40px' : '48px',
+          width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px',
+          height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
