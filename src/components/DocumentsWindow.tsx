@@ -9,9 +9,10 @@ import bariImg from '../assets/Bari.jpg'
 interface DocumentsWindowProps {
   onClose: () => void
   onMinimize?: () => void
+  icon?: React.ReactNode
 }
 
-export default function DocumentsWindow({ onClose, onMinimize }: DocumentsWindowProps) {
+export default function DocumentsWindow({ onClose, onMinimize, icon }: DocumentsWindowProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const [loadingImages, setLoadingImages] = useState<Record<string, boolean>>({})
@@ -44,6 +45,7 @@ export default function DocumentsWindow({ onClose, onMinimize }: DocumentsWindow
       defaultPosition={{ x: 150, y: 100 }}
       onClose={onClose}
       onMinimize={onMinimize}
+      icon={icon}
     >
       <div style={{ padding: windowWidth <= 480 ? '15px' : '20px' }}>
         <h2 style={{ marginTop: 0, fontSize: windowWidth <= 480 ? '16px' : '18px', marginBottom: windowWidth <= 480 ? '15px' : '20px' }}>I miei documenti</h2>

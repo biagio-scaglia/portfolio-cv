@@ -5,6 +5,13 @@ button {
   font-size: 12px;
 }
 
+/* I pulsanti di controllo della finestra non devono avere margin dal button globale */
+.title-bar-controls button {
+  margin: 0 2px !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+}
+
 /* Glass frame effect */
 .window.glass {
   background: rgba(255, 255, 255, 0.1) !important;
@@ -30,6 +37,15 @@ button:active {
 
 button:hover:not(:active) {
   filter: brightness(1.05);
+}
+
+/* I pulsanti di controllo non devono avere questi effetti */
+.title-bar-controls button:active {
+  transform: none !important;
+}
+
+.title-bar-controls button:hover:not(:active) {
+  filter: none !important;
 }
 
 .window {
@@ -85,6 +101,43 @@ button:hover:not(:active) {
   visibility: visible !important;
   opacity: 1 !important;
   color: inherit !important;
+}
+
+/* Assicura che le icone nell'header delle finestre siano visibili */
+.title-bar-text img,
+.title-bar-text span img {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: 16px !important;
+  height: 16px !important;
+  object-fit: contain !important;
+}
+
+.title-bar-text i {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  font-size: 16px !important;
+}
+
+/* Assicura che le icone nella taskbar siano visibili */
+.taskbar-button img {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: 18px !important;
+  height: 18px !important;
+  object-fit: contain !important;
+}
+
+/* Assicura che i pulsanti di controllo della finestra siano visibili */
+.title-bar-controls {
+  display: flex !important;
+}
+
+.title-bar-controls button {
+  margin: 0 2px !important;
 }
 
 .taskbar-button:hover:not(.is-active) {

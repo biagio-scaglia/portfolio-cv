@@ -11,6 +11,7 @@ interface WindowProps {
   onMaximize?: () => void
   glassFrame?: boolean
   glassColor?: string
+  icon?: ReactNode
 }
 
 export default function Window({
@@ -24,6 +25,7 @@ export default function Window({
   onMaximize,
   glassFrame = false,
   glassColor,
+  icon,
 }: WindowProps) {
   const [position, setPosition] = useState(defaultPosition)
   const [isDragging, setIsDragging] = useState(false)
@@ -263,8 +265,17 @@ export default function Window({
         className={`title-bar active ${glassFrame ? 'glass' : ''}`}
         onMouseDown={isMaximized ? undefined : handleMouseDown}
         style={{ cursor: isMaximized ? 'default' : 'grab' }}
+        role="banner"
+        aria-label={`Finestra ${title}`}
       >
-        <div className="title-bar-text">{title}</div>
+        <div className="title-bar-text" style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'visible' }}>
+          {icon && (
+            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '16px', height: '16px', flexShrink: 0, overflow: 'visible', position: 'relative', zIndex: 1 }}>
+              {icon}
+            </span>
+          )}
+          <span style={{ flex: '0 0 auto' }}>{title}</span>
+        </div>
         <div className="title-bar-controls">
           {onMinimize && (
             <button aria-label="Minimize" onClick={onMinimize} />
@@ -272,6 +283,7 @@ export default function Window({
           <button 
             aria-label={isMaximized ? "Restore" : "Maximize"} 
             onClick={handleMaximize}
+            className={isMaximized ? "is-restore" : "is-maximize"}
           />
           {onClose && (
             <button aria-label="Close" onClick={onClose} />

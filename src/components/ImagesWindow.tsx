@@ -14,6 +14,7 @@ interface ImagesWindowProps {
   slideshowIntervalSeconds?: number
   onSlideshowChange?: (enabled: boolean, seconds: number) => void
   onMinimize?: () => void
+  icon?: React.ReactNode
 }
 
 export default function ImagesWindow({ 
@@ -23,7 +24,8 @@ export default function ImagesWindow({
   isSlideshowEnabled = false,
   slideshowIntervalSeconds = 5,
   onSlideshowChange,
-  onMinimize
+  onMinimize,
+  icon,
 }: ImagesWindowProps) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const [localSlideshowEnabled, setLocalSlideshowEnabled] = useState(isSlideshowEnabled)
@@ -152,6 +154,7 @@ export default function ImagesWindow({
       defaultPosition={{ x: 150, y: 100 }}
       onClose={onClose}
       onMinimize={onMinimize}
+      icon={icon}
     >
       <div style={{ padding: windowWidth <= 480 ? '15px' : '20px' }}>
         <h2 style={{ marginTop: 0, fontSize: windowWidth <= 480 ? '16px' : '18px', marginBottom: windowWidth <= 480 ? '15px' : '20px' }}>Scegli uno sfondo</h2>

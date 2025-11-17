@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef, lazy, Suspense } from 'react'
 import Window from './components/Window'
 import DesktopIcon from './components/DesktopIcon'
 import WelcomeModal from './components/WelcomeModal'
@@ -6,7 +6,18 @@ import BootScreen from './components/BootScreen'
 import StartMenu from './components/StartMenu'
 import ShutdownScreen from './components/ShutdownScreen'
 import LoadingFallback from './components/LoadingFallback'
+import TaskbarThumbnail from './components/TaskbarThumbnail'
 import taskbarIcon from './assets/icona taskbar.png'
+import folderIcon from './assets/icone/cartella.png'
+import settingsIcon from './assets/icone/impostazioni.png'
+import infoIcon from './assets/icone/info.png'
+import userIcon from './assets/icone/user.png'
+import certificationsIcon from './assets/icone/certificazioni.png'
+import musicIcon from './assets/icone/music.png'
+import workExperienceIcon from './assets/icone/esperienze.png'
+import skillsIcon from './assets/icone/competenze.png'
+import educationIcon from './assets/icone/formazione.png'
+import noteIcon from './assets/icone/note.png'
 import defaultBackground from './assets/sfondo.jpg'
 import './App.css'
 
@@ -22,6 +33,7 @@ const DocumentsWindow = lazy(() => import('./components/DocumentsWindow'))
 const ImagesWindow = lazy(() => import('./components/ImagesWindow'))
 const ComputerWindow = lazy(() => import('./components/ComputerWindow'))
 const MusicWindow = lazy(() => import('./components/MusicWindow'))
+const SettingsWindow = lazy(() => import('./components/SettingsWindow'))
 
 // Carica dinamicamente tutti i file jpg dalla cartella sfondo per lo slideshow (lazy loading)
 const backgroundImages = import.meta.glob('./assets/sfondo/*.jpg', { eager: false }) as Record<string, () => Promise<{ default: string }>>
@@ -44,6 +56,7 @@ function App() {
     images: false,
     computer: false,
     music: false,
+    settings: false,
   })
   const [minimizedWindows, setMinimizedWindows] = useState<Set<keyof typeof openWindows>>(new Set())
   const [desktopBackground, setDesktopBackground] = useState(defaultBackground)
@@ -53,7 +66,7 @@ function App() {
 
   // Ottieni lista di tutti gli sfondi disponibili (escluso Starter) - lazy loading
   const [allBackgrounds, setAllBackgrounds] = useState<string[]>([defaultBackground])
-  
+    
   useEffect(() => {
     // Carica le immagini in modo lazy
     const sortedFiles = Object.entries(backgroundImages)
@@ -109,15 +122,21 @@ function App() {
   }, [])
   
   // Impostazioni accessibilità
-  const [accessibilitySettings] = useState({
+  const [accessibilitySettings, setAccessibilitySettings] = useState({
     highContrast: false,
     fontSize: 'medium' as 'small' | 'medium' | 'large',
     showAnimations: true,
     screenReader: false,
+    iconSize: 'medium' as 'small' | 'medium' | 'large',
+    focusVisible: true,
   })
 
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null)
   const [currentTime, setCurrentTime] = useState(new Date())
+  const [hoveredTaskbarButton, setHoveredTaskbarButton] = useState<{
+    window: keyof typeof openWindows
+    buttonRect: DOMRect
+  } | null>(null)
   const getInitialIconPositions = () => {
     const isMobile = window.innerWidth <= 480
     const isTablet = window.innerWidth <= 768 && window.innerWidth > 480
@@ -132,6 +151,7 @@ function App() {
         education: { x: 20, y: 180 },
         certifications: { x: 100, y: 180 },
         note: { x: 20, y: 260 },
+        settings: { x: 100, y: 260 },
       }
     } else if (isTablet) {
       // Tablet: griglia 3 colonne
@@ -143,6 +163,7 @@ function App() {
         education: { x: 130, y: 120 },
         certifications: { x: 230, y: 120 },
         note: { x: 30, y: 210 },
+        settings: { x: 130, y: 210 },
       }
     } else {
       // Desktop: orizzontale
@@ -154,6 +175,7 @@ function App() {
         education: { x: 470, y: 30 },
         certifications: { x: 580, y: 30 },
         note: { x: 690, y: 30 },
+        settings: { x: 800, y: 30 },
       }
     }
   }
@@ -170,7 +192,7 @@ function App() {
     const handleResize = () => {
       clearTimeout(resizeTimeout)
       resizeTimeout = window.setTimeout(() => {
-        setIconPositions(getInitialIconPositions())
+      setIconPositions(getInitialIconPositions())
       }, 150)
     }
 
@@ -181,6 +203,16 @@ function App() {
       clearTimeout(resizeTimeout)
       window.removeEventListener('resize', handleResize)
     }
+  }, [])
+
+  const handleClose = useCallback((window: keyof typeof openWindows) => {
+    // Chiudi la finestra
+    setOpenWindows((prev) => ({ ...prev, [window]: false }))
+    setMinimizedWindows((prevMin) => {
+      const newMin = new Set(prevMin)
+      newMin.delete(window)
+      return newMin
+    })
   }, [])
 
   const toggleWindow = useCallback((window: keyof typeof openWindows) => {
@@ -276,12 +308,22 @@ function App() {
       images: false,
       computer: false,
       music: false,
+      settings: false,
     })
     setSelectedIcon(null)
     setDesktopBackground(defaultBackground)
     setMinimizedWindows(new Set())
     // Reset posizioni icone
     setIconPositions(getInitialIconPositions())
+    // Reset impostazioni accessibilità
+    setAccessibilitySettings({
+      highContrast: false,
+      fontSize: 'medium' as 'small' | 'medium' | 'large',
+      showAnimations: true,
+      screenReader: false,
+      iconSize: 'medium' as 'small' | 'medium' | 'large',
+      focusVisible: true,
+    })
   }, [])
 
   // Applica impostazioni accessibilità
@@ -394,6 +436,38 @@ function App() {
       root.removeAttribute('role')
       root.removeAttribute('aria-label')
     }
+
+    // Focus visibile
+    if (accessibilitySettings.focusVisible) {
+      root.style.setProperty('--focus-outline', '2px solid rgba(100, 150, 255, 0.8)')
+      const style = document.createElement('style')
+      style.id = 'focus-visible-style'
+      style.textContent = `
+        *:focus-visible {
+          outline: 2px solid rgba(100, 150, 255, 0.8) !important;
+          outline-offset: 2px !important;
+        }
+      `
+      if (!document.getElementById('focus-visible-style')) {
+        document.head.appendChild(style)
+      }
+    } else {
+      root.style.removeProperty('--focus-outline')
+      const style = document.getElementById('focus-visible-style')
+      if (style) {
+        style.remove()
+      }
+    }
+
+    // Dimensione icone desktop
+    const iconSizeMap = {
+      small: { icon: '36px', container: '40px' },
+      medium: { icon: '48px', container: '48px' },
+      large: { icon: '60px', container: '60px' },
+    }
+    const iconSize = iconSizeMap[accessibilitySettings.iconSize]
+    root.style.setProperty('--icon-size', iconSize.icon)
+    root.style.setProperty('--icon-container-size', iconSize.container)
   }, [accessibilitySettings])
 
   // Aggiorna l'indice quando cambia lo sfondo manualmente
@@ -431,6 +505,58 @@ function App() {
     }
   }, [allBackgrounds, desktopBackground])
 
+  // Helper per ottenere il titolo della finestra
+  const getWindowTitle = useCallback((window: keyof typeof openWindows): string => {
+    const titles: Record<keyof typeof openWindows, string> = {
+      about: 'Presentazione.txt',
+      personalInfo: 'Informazioni Personali.txt',
+      workExperience: 'Esperienze Lavorative.txt',
+      skills: 'Competenze.txt',
+      education: 'Formazione.txt',
+      certifications: 'Certificazioni.txt',
+      note: 'Note - Form Contatti',
+      documents: 'Documenti',
+      images: 'Immagini - Sfondo Desktop',
+      computer: 'Computer - Informazioni Sistema',
+      music: 'Musica',
+      settings: 'Impostazioni - Accessibilità',
+    }
+    return titles[window] || 'Finestra'
+  }, [])
+
+  // Handler per hover sui pulsanti della taskbar
+  const thumbnailHoverTimeoutRef = useRef<number | null>(null)
+
+  const handleTaskbarButtonHover = useCallback((window: keyof typeof openWindows, e: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    setHoveredTaskbarButton({ window, buttonRect: rect })
+  }, [])
+
+  const handleTaskbarButtonLeave = useCallback(() => {
+    // Cancella eventuali timeout precedenti
+    if (thumbnailHoverTimeoutRef.current) {
+      clearTimeout(thumbnailHoverTimeoutRef.current)
+    }
+    // Delay per permettere al mouse di entrare nel thumbnail
+    thumbnailHoverTimeoutRef.current = window.setTimeout(() => {
+      setHoveredTaskbarButton(null)
+      thumbnailHoverTimeoutRef.current = null
+    }, 200)
+  }, [])
+
+  const handleThumbnailEnter = useCallback(() => {
+    // Cancella il timeout se il mouse entra nel thumbnail
+    if (thumbnailHoverTimeoutRef.current) {
+      clearTimeout(thumbnailHoverTimeoutRef.current)
+      thumbnailHoverTimeoutRef.current = null
+    }
+  }, [])
+
+  const handleThumbnailLeave = useCallback(() => {
+    // Chiudi il thumbnail quando si esce
+    setHoveredTaskbarButton(null)
+  }, [])
+
   return (
     <>
       {showBootScreen && <BootScreen onComplete={handleBootComplete} />}
@@ -464,7 +590,7 @@ function App() {
       >
       {/* Desktop Icons */}
       <DesktopIcon
-        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>📄</span>}
+        icon={<img src={infoIcon} alt="Presentazione" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
         label="Presentazione"
         onClick={() => toggleWindow('about')}
         x={iconPositions.about.x}
@@ -474,7 +600,7 @@ function App() {
         onPositionChange={(x, y) => handleIconPositionChange('about', x, y)}
       />
       <DesktopIcon
-        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>👤</span>}
+        icon={<img src={userIcon} alt="Info Personali" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
         label="Info Personali"
         onClick={() => toggleWindow('personalInfo')}
         x={iconPositions.personalInfo.x}
@@ -484,7 +610,7 @@ function App() {
         onPositionChange={(x, y) => handleIconPositionChange('personalInfo', x, y)}
       />
       <DesktopIcon
-        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>💼</span>}
+        icon={<img src={workExperienceIcon} alt="Esperienze" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
         label="Esperienze"
         onClick={() => toggleWindow('workExperience')}
         x={iconPositions.workExperience.x}
@@ -494,7 +620,7 @@ function App() {
         onPositionChange={(x, y) => handleIconPositionChange('workExperience', x, y)}
       />
       <DesktopIcon
-        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>⚡</span>}
+        icon={<img src={skillsIcon} alt="Competenze" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
         label="Competenze"
         onClick={() => toggleWindow('skills')}
         x={iconPositions.skills.x}
@@ -504,7 +630,7 @@ function App() {
         onPositionChange={(x, y) => handleIconPositionChange('skills', x, y)}
       />
       <DesktopIcon
-        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>🎓</span>}
+        icon={<img src={educationIcon} alt="Formazione" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
         label="Formazione"
         onClick={() => toggleWindow('education')}
         x={iconPositions.education.x}
@@ -514,7 +640,7 @@ function App() {
         onPositionChange={(x, y) => handleIconPositionChange('education', x, y)}
       />
       <DesktopIcon
-        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>🏆</span>}
+        icon={<img src={certificationsIcon} alt="Certificazioni" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
         label="Certificazioni"
         onClick={() => toggleWindow('certifications')}
         x={iconPositions.certifications.x}
@@ -524,7 +650,7 @@ function App() {
         onPositionChange={(x, y) => handleIconPositionChange('certifications', x, y)}
       />
       <DesktopIcon
-        icon={<span style={{ fontSize: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>📝</span>}
+        icon={<img src={noteIcon} alt="Note" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
         label="Note"
         onClick={() => toggleWindow('note')}
         x={iconPositions.note.x}
@@ -533,17 +659,28 @@ function App() {
         onSelect={() => setSelectedIcon('note')}
         onPositionChange={(x, y) => handleIconPositionChange('note', x, y)}
       />
+      <DesktopIcon
+        icon={<img src={settingsIcon} alt="Impostazioni" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
+        label="Impostazioni"
+        onClick={() => toggleWindow('settings')}
+        x={iconPositions.settings.x}
+        y={iconPositions.settings.y}
+        isSelected={selectedIcon === 'settings'}
+        onSelect={() => setSelectedIcon('settings')}
+        onPositionChange={(x, y) => handleIconPositionChange('settings', x, y)}
+      />
       {openWindows.about && !minimizedWindows.has('about') && (
         <Window
           title="Presentazione.txt"
           width={650}
           height={450}
           defaultPosition={{ x: 50, y: 50 }}
-          onClose={() => toggleWindow('about')}
+          onClose={() => handleClose('about')}
           onMinimize={() => handleMinimize('about')}
+          icon={<img src={infoIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
         >
           <Suspense fallback={<LoadingFallback />}>
-            <About />
+          <About />
           </Suspense>
         </Window>
       )}
@@ -554,11 +691,12 @@ function App() {
           width={600}
           height={500}
           defaultPosition={{ x: 200, y: 100 }}
-          onClose={() => toggleWindow('personalInfo')}
+          onClose={() => handleClose('personalInfo')}
           onMinimize={() => handleMinimize('personalInfo')}
+          icon={<img src={userIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
         >
           <Suspense fallback={<LoadingFallback />}>
-            <PersonalInfo />
+          <PersonalInfo />
           </Suspense>
         </Window>
       )}
@@ -569,11 +707,12 @@ function App() {
           width={700}
           height={600}
           defaultPosition={{ x: 300, y: 150 }}
-          onClose={() => toggleWindow('workExperience')}
+          onClose={() => handleClose('workExperience')}
           onMinimize={() => handleMinimize('workExperience')}
+          icon={<img src={workExperienceIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
         >
           <Suspense fallback={<LoadingFallback />}>
-            <WorkExperience />
+          <WorkExperience />
           </Suspense>
         </Window>
       )}
@@ -584,11 +723,12 @@ function App() {
           width={650}
           height={500}
           defaultPosition={{ x: 150, y: 200 }}
-          onClose={() => toggleWindow('skills')}
+          onClose={() => handleClose('skills')}
           onMinimize={() => handleMinimize('skills')}
+          icon={<img src={skillsIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
         >
           <Suspense fallback={<LoadingFallback />}>
-            <Skills />
+          <Skills />
           </Suspense>
         </Window>
       )}
@@ -599,11 +739,12 @@ function App() {
           width={600}
           height={500}
           defaultPosition={{ x: 400, y: 100 }}
-          onClose={() => toggleWindow('education')}
+          onClose={() => handleClose('education')}
           onMinimize={() => handleMinimize('education')}
+          icon={<img src={educationIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
         >
           <Suspense fallback={<LoadingFallback />}>
-            <Education />
+          <Education />
           </Suspense>
         </Window>
       )}
@@ -614,11 +755,12 @@ function App() {
           width={600}
           height={600}
           defaultPosition={{ x: 250, y: 250 }}
-          onClose={() => toggleWindow('certifications')}
+          onClose={() => handleClose('certifications')}
           onMinimize={() => handleMinimize('certifications')}
+          icon={<img src={certificationsIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
         >
           <Suspense fallback={<LoadingFallback />}>
-            <Certifications />
+          <Certifications />
           </Suspense>
         </Window>
       )}
@@ -629,50 +771,66 @@ function App() {
           width={700}
           height={700}
           defaultPosition={{ x: 350, y: 100 }}
-          onClose={() => toggleWindow('note')}
+          onClose={() => handleClose('note')}
           onMinimize={() => handleMinimize('note')}
           glassFrame={true}
           glassColor="#4a9eff"
+          icon={<img src={noteIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
         >
           <Suspense fallback={<LoadingFallback />}>
-            <Note />
+          <Note />
           </Suspense>
         </Window>
       )}
       {openWindows.documents && !minimizedWindows.has('documents') && (
         <Suspense fallback={<LoadingFallback />}>
           <DocumentsWindow 
-            onClose={() => toggleWindow('documents')} 
+            onClose={() => handleClose('documents')} 
             onMinimize={() => handleMinimize('documents')}
+            icon={<img src={folderIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
           />
         </Suspense>
       )}
       {openWindows.images && !minimizedWindows.has('images') && (
         <Suspense fallback={<LoadingFallback />}>
-          <ImagesWindow 
-            onClose={() => toggleWindow('images')} 
-            onBackgroundChange={setDesktopBackground}
-            currentBackground={desktopBackground}
-            isSlideshowEnabled={isSlideshowEnabled}
-            slideshowIntervalSeconds={slideshowIntervalSeconds}
-            onSlideshowChange={handleSlideshowChange}
+        <ImagesWindow 
+            onClose={() => handleClose('images')}
+          onBackgroundChange={setDesktopBackground}
+          currentBackground={desktopBackground}
+          isSlideshowEnabled={isSlideshowEnabled}
+          slideshowIntervalSeconds={slideshowIntervalSeconds}
+          onSlideshowChange={handleSlideshowChange}
             onMinimize={() => handleMinimize('images')}
-          />
+            icon={<i className="fas fa-image" style={{ fontSize: '16px', display: 'inline-block', visibility: 'visible', opacity: 1 }}></i>}
+        />
         </Suspense>
       )}
       {openWindows.computer && !minimizedWindows.has('computer') && (
         <Suspense fallback={<LoadingFallback />}>
-          <ComputerWindow 
-            onClose={() => toggleWindow('computer')} 
+        <ComputerWindow 
+            onClose={() => handleClose('computer')}
             onMinimize={() => handleMinimize('computer')}
-          />
+            icon={<i className="fas fa-laptop" style={{ fontSize: '16px', display: 'inline-block', visibility: 'visible', opacity: 1 }}></i>}
+        />
         </Suspense>
       )}
       {openWindows.music && !minimizedWindows.has('music') && (
         <Suspense fallback={<LoadingFallback />}>
           <MusicWindow 
-            onClose={() => toggleWindow('music')} 
+            onClose={() => handleClose('music')} 
             onMinimize={() => handleMinimize('music')}
+            icon={<img src={musicIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
+          />
+        </Suspense>
+      )}
+      {openWindows.settings && !minimizedWindows.has('settings') && (
+        <Suspense fallback={<LoadingFallback />}>
+          <SettingsWindow 
+            onClose={() => handleClose('settings')} 
+            onMinimize={() => handleMinimize('settings')}
+            settings={accessibilitySettings}
+            onSettingsChange={setAccessibilitySettings}
+            icon={<img src={settingsIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
           />
         </Suspense>
       )}
@@ -723,7 +881,7 @@ function App() {
             width: '45px',
             height: '40px',
             borderRadius: '0',
-            boxShadow: showStartMenu || openWindows.about || openWindows.personalInfo || openWindows.workExperience || openWindows.skills || openWindows.education || openWindows.certifications || openWindows.note || openWindows.documents || openWindows.images || openWindows.computer || openWindows.music
+            boxShadow: showStartMenu || openWindows.about || openWindows.personalInfo || openWindows.workExperience || openWindows.skills || openWindows.education || openWindows.certifications || openWindows.note || openWindows.documents || openWindows.images || openWindows.computer || openWindows.music || openWindows.settings
               ? 'inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 8px rgba(100, 150, 255, 0.4)'
               : 'inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.2)',
             transition: 'all 0.2s',
@@ -746,6 +904,8 @@ function App() {
         <button
           className={`taskbar-button ${isWindowActive('about') ? 'is-active' : ''}`}
           onClick={() => handleTaskbarClick('about')}
+          onMouseEnter={(e) => handleTaskbarButtonHover('about', e)}
+          onMouseLeave={handleTaskbarButtonLeave}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -773,11 +933,23 @@ function App() {
             transition: 'all 0.2s',
           }}
         >
-          <i className="fas fa-file-alt" style={{ fontSize: '18px', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))', display: 'inline-block', visibility: 'visible', opacity: 1, color: '#fff' }}></i>
+          <img 
+            src={infoIcon} 
+            alt="Presentazione" 
+            style={{ 
+              width: '18px', 
+              height: '18px',
+              objectFit: 'contain',
+              display: 'block',
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+            }} 
+          />
         </button>
         <button
           className={`taskbar-button ${isWindowActive('personalInfo') ? 'is-active' : ''}`}
           onClick={() => handleTaskbarClick('personalInfo')}
+          onMouseEnter={(e) => handleTaskbarButtonHover('personalInfo', e)}
+          onMouseLeave={handleTaskbarButtonLeave}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -805,11 +977,23 @@ function App() {
             transition: 'all 0.2s',
           }}
         >
-          <i className="fas fa-user" style={{ fontSize: '18px', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))', display: 'inline-block', visibility: 'visible', opacity: 1, color: '#fff' }}></i>
+          <img 
+            src={userIcon} 
+            alt="Info Personali" 
+            style={{ 
+              width: '18px', 
+              height: '18px',
+              objectFit: 'contain',
+              display: 'block',
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+            }} 
+          />
         </button>
         <button
           className={`taskbar-button ${isWindowActive('workExperience') ? 'is-active' : ''}`}
           onClick={() => handleTaskbarClick('workExperience')}
+          onMouseEnter={(e) => handleTaskbarButtonHover('workExperience', e)}
+          onMouseLeave={handleTaskbarButtonLeave}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -837,11 +1021,23 @@ function App() {
             transition: 'all 0.2s',
           }}
         >
-          <i className="fas fa-briefcase" style={{ fontSize: '18px', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))', display: 'inline-block', visibility: 'visible', opacity: 1, color: '#fff' }}></i>
+          <img 
+            src={workExperienceIcon} 
+            alt="Esperienze" 
+            style={{ 
+              width: '18px', 
+              height: '18px',
+              objectFit: 'contain',
+              display: 'block',
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+            }} 
+          />
         </button>
         <button
           className={`taskbar-button ${isWindowActive('skills') ? 'is-active' : ''}`}
           onClick={() => handleTaskbarClick('skills')}
+          onMouseEnter={(e) => handleTaskbarButtonHover('skills', e)}
+          onMouseLeave={handleTaskbarButtonLeave}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -869,11 +1065,23 @@ function App() {
             transition: 'all 0.2s',
           }}
         >
-          <i className="fas fa-bolt" style={{ fontSize: '18px', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))', display: 'inline-block', visibility: 'visible', opacity: 1, color: '#fff' }}></i>
+          <img 
+            src={skillsIcon} 
+            alt="Competenze" 
+            style={{ 
+              width: '18px', 
+              height: '18px',
+              objectFit: 'contain',
+              display: 'block',
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+            }} 
+          />
         </button>
         <button
           className={`taskbar-button ${isWindowActive('education') ? 'is-active' : ''}`}
           onClick={() => handleTaskbarClick('education')}
+          onMouseEnter={(e) => handleTaskbarButtonHover('education', e)}
+          onMouseLeave={handleTaskbarButtonLeave}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -901,11 +1109,23 @@ function App() {
             transition: 'all 0.2s',
           }}
         >
-          <i className="fas fa-graduation-cap" style={{ fontSize: '18px', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))', display: 'inline-block', visibility: 'visible', opacity: 1, color: '#fff' }}></i>
+          <img 
+            src={educationIcon} 
+            alt="Formazione" 
+            style={{ 
+              width: '18px', 
+              height: '18px',
+              objectFit: 'contain',
+              display: 'block',
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+            }} 
+          />
         </button>
         <button
           className={`taskbar-button ${isWindowActive('certifications') ? 'is-active' : ''}`}
           onClick={() => handleTaskbarClick('certifications')}
+          onMouseEnter={(e) => handleTaskbarButtonHover('certifications', e)}
+          onMouseLeave={handleTaskbarButtonLeave}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -933,11 +1153,23 @@ function App() {
             transition: 'all 0.2s',
           }}
         >
-          <i className="fas fa-trophy" style={{ fontSize: '18px', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))', display: 'inline-block', visibility: 'visible', opacity: 1, color: '#fff' }}></i>
+          <img 
+            src={certificationsIcon} 
+            alt="Certificazioni" 
+            style={{ 
+              width: '18px', 
+              height: '18px',
+              objectFit: 'contain',
+              display: 'block',
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+            }} 
+          />
         </button>
         <button
           className={`taskbar-button ${isWindowActive('note') ? 'is-active' : ''}`}
           onClick={() => handleTaskbarClick('note')}
+          onMouseEnter={(e) => handleTaskbarButtonHover('note', e)}
+          onMouseLeave={handleTaskbarButtonLeave}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -965,11 +1197,23 @@ function App() {
             transition: 'all 0.2s',
           }}
         >
-          <i className="fas fa-sticky-note" style={{ fontSize: '18px', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))', display: 'inline-block', visibility: 'visible', opacity: 1, color: '#fff' }}></i>
+          <img 
+            src={noteIcon} 
+            alt="Note" 
+            style={{ 
+              width: '18px', 
+              height: '18px',
+              objectFit: 'contain',
+              display: 'block',
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+            }} 
+          />
         </button>
         <button
           className={`taskbar-button ${isWindowActive('music') ? 'is-active' : ''}`}
           onClick={() => handleTaskbarClick('music')}
+          onMouseEnter={(e) => handleTaskbarButtonHover('music', e)}
+          onMouseLeave={handleTaskbarButtonLeave}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -997,11 +1241,23 @@ function App() {
             transition: 'all 0.2s',
           }}
         >
-          <i className="fas fa-music" style={{ fontSize: '18px', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))', display: 'inline-block', visibility: 'visible', opacity: 1, color: '#fff' }}></i>
+          <img 
+            src={musicIcon} 
+            alt="Musica" 
+            style={{ 
+              width: '18px', 
+              height: '18px',
+              objectFit: 'contain',
+              display: 'block',
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+            }} 
+          />
         </button>
         <button
           className={`taskbar-button ${isWindowActive('documents') ? 'is-active' : ''}`}
           onClick={() => handleTaskbarClick('documents')}
+          onMouseEnter={(e) => handleTaskbarButtonHover('documents', e)}
+          onMouseLeave={handleTaskbarButtonLeave}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -1029,11 +1285,23 @@ function App() {
             transition: 'all 0.2s',
           }}
         >
-          <i className="fas fa-folder" style={{ fontSize: '18px', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))', display: 'inline-block', visibility: 'visible', opacity: 1, color: '#fff' }}></i>
+          <img 
+            src={folderIcon} 
+            alt="Documenti" 
+            style={{ 
+              width: '18px', 
+              height: '18px',
+              objectFit: 'contain',
+              display: 'block',
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+            }} 
+          />
         </button>
         <button
           className={`taskbar-button ${isWindowActive('images') ? 'is-active' : ''}`}
           onClick={() => handleTaskbarClick('images')}
+          onMouseEnter={(e) => handleTaskbarButtonHover('images', e)}
+          onMouseLeave={handleTaskbarButtonLeave}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -1066,6 +1334,8 @@ function App() {
         <button
           className={`taskbar-button ${isWindowActive('computer') ? 'is-active' : ''}`}
           onClick={() => handleTaskbarClick('computer')}
+          onMouseEnter={(e) => handleTaskbarButtonHover('computer', e)}
+          onMouseLeave={handleTaskbarButtonLeave}
           style={{
             padding: '4px 12px',
             fontSize: '11px',
@@ -1095,6 +1365,50 @@ function App() {
         >
           <i className="fas fa-desktop" style={{ fontSize: '18px', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))', display: 'inline-block', visibility: 'visible', opacity: 1, color: '#fff' }}></i>
         </button>
+        <button
+          className={`taskbar-button ${isWindowActive('settings') ? 'is-active' : ''}`}
+          onClick={() => handleTaskbarClick('settings')}
+          onMouseEnter={(e) => handleTaskbarButtonHover('settings', e)}
+          onMouseLeave={handleTaskbarButtonLeave}
+          style={{
+            padding: '4px 12px',
+            fontSize: '11px',
+            border: 'none',
+            background: isWindowActive('settings')
+              ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.3) 100%)'
+              : 'transparent',
+            backdropFilter: isWindowActive('settings') ? 'blur(25px)' : 'none',
+            WebkitBackdropFilter: isWindowActive('settings') ? 'blur(25px)' : 'none',
+            color: '#fff',
+            cursor: 'pointer',
+            fontWeight: isWindowActive('settings') ? 'bold' : 'normal',
+            minWidth: 'auto',
+            width: 'auto',
+            height: '36px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            borderRadius: '2px',
+            margin: '2px',
+            boxShadow: isWindowActive('settings')
+              ? 'inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 0 6px rgba(100, 150, 255, 0.3)'
+              : 'none',
+            transition: 'all 0.2s',
+          }}
+        >
+          <img 
+            src={settingsIcon} 
+            alt="Impostazioni" 
+            style={{ 
+              width: '18px', 
+              height: '18px',
+              objectFit: 'contain',
+              display: 'block',
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+            }} 
+          />
+        </button>
         <div style={{ flex: 1 }} />
         <div
           className="taskbar-clock"
@@ -1116,6 +1430,38 @@ function App() {
           {currentTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}
         </div>
       </div>
+      {/* Taskbar Thumbnail */}
+      {hoveredTaskbarButton && (
+        <TaskbarThumbnail
+          windowKey={hoveredTaskbarButton.window}
+          windowTitle={getWindowTitle(hoveredTaskbarButton.window)}
+          isOpen={openWindows[hoveredTaskbarButton.window]}
+          isMinimized={minimizedWindows.has(hoveredTaskbarButton.window)}
+          onOpen={() => {
+            setOpenWindows((prev) => ({ ...prev, [hoveredTaskbarButton!.window]: true }))
+            if (minimizedWindows.has(hoveredTaskbarButton!.window)) {
+              setMinimizedWindows((prev) => {
+                const newMin = new Set(prev)
+                newMin.delete(hoveredTaskbarButton!.window)
+                return newMin
+              })
+            }
+            setHoveredTaskbarButton(null)
+          }}
+          onClose={() => {
+            handleClose(hoveredTaskbarButton!.window)
+            setHoveredTaskbarButton(null)
+          }}
+          onMinimize={() => {
+            handleMinimize(hoveredTaskbarButton!.window)
+            setHoveredTaskbarButton(null)
+          }}
+          onThumbnailEnter={handleThumbnailEnter}
+          onThumbnailLeave={handleThumbnailLeave}
+          position={{ x: 0, y: 0 }}
+          buttonRect={hoveredTaskbarButton.buttonRect}
+        />
+      )}
       </div>
       )}
     </>

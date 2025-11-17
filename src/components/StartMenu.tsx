@@ -1,4 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
+import infoIcon from '../assets/icone/info.png'
+import userIcon from '../assets/icone/user.png'
+import certificationsIcon from '../assets/icone/certificazioni.png'
+import folderIcon from '../assets/icone/cartella.png'
+import settingsIcon from '../assets/icone/impostazioni.png'
+import musicIcon from '../assets/icone/music.png'
+import workExperienceIcon from '../assets/icone/esperienze.png'
+import skillsIcon from '../assets/icone/competenze.png'
+import educationIcon from '../assets/icone/formazione.png'
+import noteIcon from '../assets/icone/note.png'
 
 interface StartMenuProps {
   isOpen: boolean
@@ -33,21 +43,21 @@ export default function StartMenu({ isOpen, onClose, onOpenWindow, onShutdown }:
     }
   }, [isOpen, onClose])
 
-  const menuItems = [
-    { icon: 'fas fa-file-alt', label: 'Presentazione', window: 'about' },
-    { icon: 'fas fa-user', label: 'Info Personali', window: 'personalInfo' },
-    { icon: 'fas fa-briefcase', label: 'Esperienze', window: 'workExperience' },
-    { icon: 'fas fa-bolt', label: 'Competenze', window: 'skills' },
-    { icon: 'fas fa-graduation-cap', label: 'Formazione', window: 'education' },
-    { icon: 'fas fa-trophy', label: 'Certificazioni', window: 'certifications' },
-    { icon: 'fas fa-sticky-note', label: 'Note', window: 'note' },
+  const menuItems: Array<{ icon: string; iconSrc?: string; label: string; window: string }> = [
+    { icon: 'image', iconSrc: infoIcon, label: 'Presentazione', window: 'about' },
+    { icon: 'image', iconSrc: userIcon, label: 'Info Personali', window: 'personalInfo' },
+    { icon: 'image', iconSrc: workExperienceIcon, label: 'Esperienze', window: 'workExperience' },
+    { icon: 'image', iconSrc: skillsIcon, label: 'Competenze', window: 'skills' },
+    { icon: 'image', iconSrc: educationIcon, label: 'Formazione', window: 'education' },
+    { icon: 'image', iconSrc: certificationsIcon, label: 'Certificazioni', window: 'certifications' },
+    { icon: 'image', iconSrc: noteIcon, label: 'Note', window: 'note' },
   ]
 
-  const quickAccessItems = [
+  const quickAccessItems: Array<{ icon: string; iconSrc?: string; label: string; window: string }> = [
     { icon: 'fas fa-laptop', label: 'Computer', window: 'computer' },
-    { icon: 'fas fa-folder', label: 'Documenti', window: 'documents' },
+    { icon: 'image', iconSrc: folderIcon, label: 'Documenti', window: 'documents' },
     { icon: 'fas fa-image', label: 'Immagini', window: 'images' },
-    { icon: 'fas fa-music', label: 'Musica', window: 'music' },
+    { icon: 'image', iconSrc: musicIcon, label: 'Musica', window: 'music' },
   ]
 
   if (!isOpen) return null
@@ -109,7 +119,20 @@ export default function StartMenu({ isOpen, onClose, onOpenWindow, onShutdown }:
                 ;(e.currentTarget.style as any).WebkitBackdropFilter = 'none'
               }}
             >
-              <i className={item.icon} style={{ fontSize: windowWidth <= 480 ? '20px' : '18px', width: windowWidth <= 480 ? '30px' : '28px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}></i>
+              {item.icon === 'image' && item.iconSrc ? (
+                <img 
+                  src={item.iconSrc} 
+                  alt={item.label} 
+                  style={{ 
+                    width: windowWidth <= 480 ? '20px' : '18px', 
+                    height: windowWidth <= 480 ? '20px' : '18px',
+                    objectFit: 'contain',
+                    display: 'block'
+                  }} 
+                />
+              ) : (
+                <i className={item.icon} style={{ fontSize: windowWidth <= 480 ? '20px' : '18px', width: windowWidth <= 480 ? '30px' : '28px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}></i>
+              )}
               <span style={{ fontWeight: '400' }}>{item.label}</span>
             </div>
           ))}
@@ -153,7 +176,20 @@ export default function StartMenu({ isOpen, onClose, onOpenWindow, onShutdown }:
               e.currentTarget.style.background = 'transparent'
             }}
           >
-            <i className={item.icon} style={{ fontSize: '18px', width: '28px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}></i>
+            {item.icon === 'image' && item.iconSrc ? (
+              <img 
+                src={item.iconSrc} 
+                alt={item.label} 
+                style={{ 
+                  width: '18px', 
+                  height: '18px',
+                  objectFit: 'contain',
+                  display: 'block'
+                }} 
+              />
+            ) : (
+              <i className={item.icon} style={{ fontSize: '18px', width: '28px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}></i>
+            )}
             <span style={{ fontWeight: '400' }}>{item.label}</span>
           </div>
         ))}
