@@ -9,6 +9,8 @@ import workExperienceIcon from '../assets/icone/esperienze.png'
 import skillsIcon from '../assets/icone/competenze.png'
 import educationIcon from '../assets/icone/formazione.png'
 import noteIcon from '../assets/icone/note.png'
+import immaginiIcon from '../assets/icone/immagini.png'
+import computerIcon from '../assets/icone/computer.png'
 
 interface StartMenuProps {
   isOpen: boolean
@@ -54,9 +56,9 @@ export default function StartMenu({ isOpen, onClose, onOpenWindow, onShutdown }:
   ]
 
   const quickAccessItems: Array<{ icon: string; iconSrc?: string; label: string; window: string }> = [
-    { icon: 'fas fa-laptop', label: 'Computer', window: 'computer' },
+    { icon: 'image', iconSrc: computerIcon, label: 'Computer', window: 'computer' },
     { icon: 'image', iconSrc: folderIcon, label: 'Documenti', window: 'documents' },
-    { icon: 'fas fa-image', label: 'Immagini', window: 'images' },
+    { icon: 'image', iconSrc: immaginiIcon, label: 'Immagini', window: 'images' },
     { icon: 'image', iconSrc: musicIcon, label: 'Musica', window: 'music' },
   ]
 

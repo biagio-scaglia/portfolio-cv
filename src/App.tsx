@@ -18,6 +18,8 @@ import workExperienceIcon from './assets/icone/esperienze.png'
 import skillsIcon from './assets/icone/competenze.png'
 import educationIcon from './assets/icone/formazione.png'
 import noteIcon from './assets/icone/note.png'
+import immaginiIcon from './assets/icone/immagini.png'
+import computerIcon from './assets/icone/computer.png'
 import defaultBackground from './assets/sfondo.jpg'
 import './App.css'
 
@@ -801,7 +803,7 @@ function App() {
           slideshowIntervalSeconds={slideshowIntervalSeconds}
           onSlideshowChange={handleSlideshowChange}
             onMinimize={() => handleMinimize('images')}
-            icon={<i className="fas fa-image" style={{ fontSize: '16px', display: 'inline-block', visibility: 'visible', opacity: 1 }}></i>}
+            icon={<img src={immaginiIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
         />
         </Suspense>
       )}
@@ -810,7 +812,7 @@ function App() {
         <ComputerWindow 
             onClose={() => handleClose('computer')}
             onMinimize={() => handleMinimize('computer')}
-            icon={<i className="fas fa-laptop" style={{ fontSize: '16px', display: 'inline-block', visibility: 'visible', opacity: 1 }}></i>}
+            icon={<img src={computerIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
         />
         </Suspense>
       )}
@@ -1329,7 +1331,17 @@ function App() {
             transition: 'all 0.2s',
           }}
         >
-          <i className="fas fa-images" style={{ fontSize: '18px', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))', display: 'inline-block', visibility: 'visible', opacity: 1, color: '#fff' }}></i>
+          <img 
+            src={immaginiIcon} 
+            alt="Immagini" 
+            style={{ 
+              width: '18px', 
+              height: '18px',
+              objectFit: 'contain',
+              display: 'block',
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+            }} 
+          />
         </button>
         <button
           className={`taskbar-button ${isWindowActive('computer') ? 'is-active' : ''}`}
@@ -1363,7 +1375,17 @@ function App() {
             transition: 'all 0.2s',
           }}
         >
-          <i className="fas fa-desktop" style={{ fontSize: '18px', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))', display: 'inline-block', visibility: 'visible', opacity: 1, color: '#fff' }}></i>
+          <img 
+            src={computerIcon} 
+            alt="Computer" 
+            style={{ 
+              width: '18px', 
+              height: '18px',
+              objectFit: 'contain',
+              display: 'block',
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+            }} 
+          />
         </button>
         <button
           className={`taskbar-button ${isWindowActive('settings') ? 'is-active' : ''}`}
