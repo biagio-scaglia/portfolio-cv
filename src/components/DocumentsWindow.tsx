@@ -23,7 +23,7 @@ export default function DocumentsWindow({ onClose }: DocumentsWindowProps) {
     window.open(curriculumPDF, '_blank')
   }
 
-  const handleImageClick = (image: string, name: string) => {
+  const handleImageClick = (image: string) => {
     setSelectedImage(image)
   }
 
@@ -94,7 +94,7 @@ export default function DocumentsWindow({ onClose }: DocumentsWindowProps) {
               {images.map((img, index) => (
                 <div
                   key={index}
-                  onClick={() => handleImageClick(img.src, img.name)}
+                  onClick={() => handleImageClick(img.src)}
                   style={{
                     border: '1px solid #c0c0c0',
                     background: '#f0f0f0',

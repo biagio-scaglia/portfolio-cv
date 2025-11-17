@@ -219,11 +219,17 @@ button:hover:not(:active) {
   
   /* Taskbar mobile */
   .taskbar {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     height: 50px !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
     flex-wrap: nowrap !important;
     padding: 0 !important;
+    z-index: 10000 !important;
+    width: 100% !important;
   }
   
   .taskbar > button {

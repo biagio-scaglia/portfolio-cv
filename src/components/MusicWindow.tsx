@@ -104,7 +104,7 @@ export default function MusicWindow({ onClose }: MusicWindowProps) {
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
-  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0
+  // const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0
 
   return (
     <Window

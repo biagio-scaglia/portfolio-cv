@@ -46,7 +46,7 @@ function App() {
   const [desktopBackground, setDesktopBackground] = useState(defaultBackground)
   const [isSlideshowEnabled, setIsSlideshowEnabled] = useState(false)
   const [slideshowIntervalSeconds, setSlideshowIntervalSeconds] = useState(5)
-  const [currentSlideshowIndex, setCurrentSlideshowIndex] = useState(0)
+  const [, setCurrentSlideshowIndex] = useState(0)
 
   // Ottieni lista di tutti gli sfondi disponibili (escluso Starter)
   const allBackgrounds = useMemo(() => {
@@ -79,7 +79,7 @@ function App() {
   }, [])
   
   // Impostazioni accessibilità
-  const [accessibilitySettings, setAccessibilitySettings] = useState({
+  const [accessibilitySettings] = useState({
     highContrast: false,
     fontSize: 'medium' as 'small' | 'medium' | 'large',
     showAnimations: true,
@@ -178,14 +178,6 @@ function App() {
     // La finestra rimane "aperta" ma viene nascosta
   }
 
-  const handleRestore = (window: keyof typeof openWindows) => {
-    setMinimizedWindows((prev) => {
-      const newMin = new Set(prev)
-      newMin.delete(window)
-      return newMin
-    })
-    setOpenWindows((prev) => ({ ...prev, [window]: true }))
-  }
 
   // Helper per verificare se una finestra è attiva (aperta e non minimizzata)
   const isWindowActive = (window: keyof typeof openWindows) => {
@@ -605,7 +597,7 @@ function App() {
       <div
         className="taskbar"
         style={{
-          position: 'absolute',
+          position: 'fixed',
           bottom: '0',
           left: '0',
           right: '0',
@@ -617,9 +609,10 @@ function App() {
           padding: '0',
           display: 'flex',
           gap: '2px',
-          zIndex: 1000,
-          height: '40px',
+          zIndex: 10000,
+          height: window.innerWidth <= 480 ? '50px' : '40px',
           alignItems: 'center',
+          width: '100%',
         }}
       >
         {/* Start Button Windows 7 - Circolare */}

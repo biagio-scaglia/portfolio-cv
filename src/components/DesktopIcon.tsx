@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect, useRef } from 'react'
+import { type ReactNode, useState, useEffect, useRef } from 'react'
 
 interface DesktopIconProps {
   icon: ReactNode

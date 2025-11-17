@@ -59,7 +59,7 @@ export default function ImagesWindow({
         if (a.num !== b.num) return a.num - b.num
         return a.name.localeCompare(b.name)
       })
-      .map((file, index) => ({
+      .map((file) => ({
         name: `Sfondo ${file.name}`,
         url: file.url
       }))

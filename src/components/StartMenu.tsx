@@ -101,12 +101,12 @@ export default function StartMenu({ isOpen, onClose, onOpenWindow, onShutdown }:
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'linear-gradient(to bottom, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%)'
                 e.currentTarget.style.backdropFilter = 'blur(20px)'
-                e.currentTarget.style.WebkitBackdropFilter = 'blur(20px)'
+                ;(e.currentTarget.style as any).WebkitBackdropFilter = 'blur(20px)'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent'
                 e.currentTarget.style.backdropFilter = 'none'
-                e.currentTarget.style.WebkitBackdropFilter = 'none'
+                ;(e.currentTarget.style as any).WebkitBackdropFilter = 'none'
               }}
             >
               <i className={item.icon} style={{ fontSize: windowWidth <= 480 ? '20px' : '18px', width: windowWidth <= 480 ? '30px' : '28px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}></i>
