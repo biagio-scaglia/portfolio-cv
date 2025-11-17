@@ -1,0 +1,305 @@
+/* Stili personalizzati per Windows 7 */
+button {
+  margin: 4px;
+  font-family: 'Segoe UI', 'Tahoma', sans-serif;
+  font-size: 12px;
+}
+
+/* Glass frame effect */
+.window.glass {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.window.glass .title-bar {
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.window.glass .window-body {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+button:active {
+  transform: translate(0.5px, 0.5px);
+}
+
+button:hover:not(:active) {
+  filter: brightness(1.05);
+}
+
+.window {
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(0, 0, 0, 0.1);
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.window-body {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.window-body > * {
+  flex: 0 0 auto;
+}
+
+.window-body.has-space {
+  padding-bottom: 0 !important;
+}
+
+/* Rimuove spazio extra quando il contenuto è più piccolo */
+.window-body {
+  min-height: 0;
+}
+
+/* Start Button Windows 7 */
+.start-button:hover {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.25) 100%) !important;
+  backdrop-filter: blur(30px) !important;
+  -webkit-backdrop-filter: blur(30px) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 0 10px rgba(100, 150, 255, 0.3) !important;
+}
+
+.start-button:active {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.2) 100%) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Taskbar buttons Windows 7 */
+.taskbar-button {
+  transition: all 0.2s ease !important;
+  position: relative !important;
+}
+
+.taskbar-button:hover:not(.is-active) {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  box-shadow: 0 0 8px rgba(100, 150, 255, 0.2) !important;
+}
+
+/* Hover quando il bottone è attivo */
+.taskbar-button.is-active:hover {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.35) 100%) !important;
+  backdrop-filter: blur(30px) !important;
+  -webkit-backdrop-filter: blur(30px) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 0 10px rgba(100, 150, 255, 0.4) !important;
+}
+
+.taskbar-button:active {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.2) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Scrollbar retrò */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+::-webkit-scrollbar-track {
+  background: #c0c0c0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c0c0c0;
+  border: 2px outset #c0c0c0;
+  box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
+
+::-webkit-scrollbar-button {
+  background: #c0c0c0;
+  border: 1px outset #c0c0c0;
+  width: 16px;
+  height: 16px;
+}
+
+::-webkit-scrollbar-button:active {
+  border: 1px inset #c0c0c0;
+}
+
+/* Responsive - Tablet */
+@media (max-width: 768px) {
+  .window {
+    max-width: 95vw !important;
+    max-height: 85vh !important;
+    width: 95vw !important;
+  }
+  
+  button {
+    font-size: 11px;
+    padding: 5px 10px !important;
+    min-width: 70px !important;
+  }
+  
+  /* Icone desktop più piccole */
+  .desktop-icon {
+    width: 85px !important;
+  }
+  
+  .desktop-icon > div:first-child {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  
+  .desktop-icon > div:last-child {
+    font-size: 10px !important;
+  }
+
+  /* Taskbar tablet */
+  .taskbar {
+    height: 44px !important;
+    flex-wrap: wrap !important;
+    overflow-x: auto !important;
+  }
+
+  .taskbar-button {
+    min-width: 80px !important;
+    font-size: 11px !important;
+    padding: 4px 10px !important;
+  }
+
+  .taskbar-button i {
+    font-size: 16px !important;
+  }
+
+  .start-button {
+    min-width: 50px !important;
+    width: 50px !important;
+    font-size: 12px !important;
+    padding: 0 !important;
+  }
+
+  .start-button img {
+    width: 20px !important;
+    height: 20px !important;
+  }
+}
+
+/* Responsive - Mobile */
+@media (max-width: 480px) {
+  .window {
+    width: 100vw !important;
+    height: calc(100vh - 50px) !important;
+    left: 0 !important;
+    top: 0 !important;
+    max-width: 100vw !important;
+    max-height: calc(100vh - 50px) !important;
+  }
+
+  .window-body {
+    padding: 15px !important;
+    font-size: 12px !important;
+  }
+  
+  button {
+    font-size: 10px;
+    padding: 6px 10px !important;
+    min-width: 60px !important;
+  }
+  
+  button i {
+    font-size: 14px !important;
+  }
+  
+  /* Taskbar mobile */
+  .taskbar {
+    height: 50px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    flex-wrap: nowrap !important;
+    padding: 0 !important;
+  }
+  
+  .taskbar > button {
+    flex-shrink: 0 !important;
+    min-width: 50px !important;
+    width: 50px !important;
+    font-size: 10px !important;
+    padding: 4px !important;
+  }
+
+  .taskbar-button i {
+    font-size: 16px !important;
+  }
+
+  .start-button {
+    min-width: 45px !important;
+    width: 45px !important;
+    font-size: 11px !important;
+    padding: 0 !important;
+  }
+
+  .start-button img {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .start-button span {
+    display: none;
+  }
+  
+  /* Icone desktop mobile */
+  .desktop-icon {
+    width: 75px !important;
+  }
+  
+  .desktop-icon > div:first-child {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  
+  .desktop-icon > div:last-child {
+    font-size: 9px !important;
+    max-width: 75px !important;
+    padding: 2px 3px !important;
+  }
+
+  /* Desktop pattern mobile */
+  .desktop-pattern {
+    padding-bottom: 50px !important;
+  }
+  
+  /* Nascondi orologio su mobile */
+  .taskbar-clock {
+    display: none !important;
+  }
+
+  /* Fieldset mobile */
+  fieldset {
+    margin: 10px 0 !important;
+    padding: 10px !important;
+  }
+
+  legend {
+    font-size: 11px !important;
+  }
+
+  /* Input mobile */
+  input, textarea, select {
+    font-size: 14px !important;
+    padding: 6px !important;
+  }
+}
+
+/* Responsive - Desktop grande */
+@media (min-width: 1200px) {
+  .window {
+    max-width: 800px;
+  }
+}

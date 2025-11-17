@@ -1,0 +1,66 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: 'Tahoma', 'Segoe UI', sans-serif;
+  overflow: hidden;
+  user-select: none;
+  transition: font-size 0.3s ease;
+}
+
+body.no-animations * {
+  transition: none !important;
+  animation: none !important;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Desktop Windows 7 */
+.desktop-pattern {
+  background-color: #1e3a5f;
+  /* Lo sfondo viene gestito dinamicamente da App.tsx */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  body {
+    font-size: 12px;
+  }
+  
+  h1, h2, h3 {
+    font-size: clamp(14px, 4vw, 18px) !important;
+  }
+  
+  p, span, div {
+    font-size: clamp(11px, 3vw, 13px) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 11px;
+  }
+  
+  h1, h2, h3 {
+    font-size: clamp(12px, 4vw, 16px) !important;
+  }
+  
+  p, span, div {
+    font-size: clamp(10px, 3vw, 12px) !important;
+  }
+  
+  /* Migliora la leggibilità su mobile */
+  * {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+}
