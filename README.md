@@ -40,10 +40,17 @@ Portfolio interattivo completamente responsive ottimizzato per desktop, tablet e
 - **Finestre Interattive**: Minimizzazione, massimizzazione, ridimensionamento e spostamento
 - **Slideshow Sfondi**: Sistema automatico per cambiare gli sfondi del desktop
 - **Desktop Personalizzabile**: Icone trascinabili e organizzabili
-- **Player Musicale**: Lettore audio integrato
+- **Calcolatrice**: Calcolatrice funzionale con operazioni base (addizione, sottrazione, moltiplicazione, divisione)
+- **Portfolio Progetti**: Visualizzazione progetti GitHub con tecnologie utilizzate e link diretti
+- **Solitario**: Gioco Solitario Klondike completo e funzionale con drag & drop
+- **Cestino**: Gestione file eliminati con funzionalità di ripristino e svuotamento
+- **Anti-Virus**: Simulazione scansione sistema con spinner 7.css e gestione minacce
+- **Calendario**: Calendario mensile funzionale con navigazione tra mesi e selezione date
+- **Player Musicale**: Lettore audio integrato con playlist e controlli avanzati
 - **Visualizzatore Documenti**: Supporto per PDF e immagini
 - **Browser Integrato**: Navigazione web simulata
-- **Paint App**: Applicazione di disegno integrata
+- **Paint App**: Applicazione di disegno integrata con strumenti base
+- **Blocco Note**: Editor di testo con salvataggio e invio email
 
 ### 📱 Design Responsive
 - **Desktop**: Layout completo con tutte le funzionalità
@@ -146,6 +153,13 @@ portfolio-cv/
 │   │   ├── MusicWindow.tsx # Player musicale
 │   │   ├── BrowserWindow.tsx # Browser integrato
 │   │   ├── PaintWindow.tsx # Applicazione Paint
+│   │   ├── Calculator.tsx # Calcolatrice
+│   │   ├── Portfolio.tsx # Portfolio progetti
+│   │   ├── Solitaire.tsx # Gioco Solitario
+│   │   ├── Cestino.tsx # Cestino file
+│   │   ├── AntiVirus.tsx # Anti-Virus
+│   │   ├── Calendar.tsx # Calendario
+│   │   ├── Note.tsx # Blocco note
 │   │   └── ...
 │   ├── App.tsx             # Componente principale
 │   ├── App.css             # Stili globali dell'app

@@ -23,6 +23,12 @@ import computerIcon from './assets/icone/computer.png'
 import linkedinIcon from './assets/icone/linkedin.png'
 import paintIcon from './assets/icone/paint.png'
 import firefoxIcon from './assets/icone/firefox.png'
+import calculatorIcon from './assets/icone/calculator.png'
+import portfolioIcon from './assets/icone/portfolio.png'
+import solitarioIcon from './assets/icone/solitario.png'
+import cestinoIcon from './assets/icone/cestino.png'
+import antivirusIcon from './assets/icone/antivirus.png'
+import calendarIcon from './assets/icone/calendar.png'
 import defaultBackground from './assets/sfondo.jpg'
 import './App.css'
 
@@ -41,6 +47,12 @@ const MusicWindow = lazy(() => import('./components/MusicWindow'))
 const SettingsWindow = lazy(() => import('./components/SettingsWindow'))
 const PaintWindow = lazy(() => import('./components/PaintWindow'))
 const BrowserWindow = lazy(() => import('./components/BrowserWindow'))
+const Calculator = lazy(() => import('./components/Calculator'))
+const Portfolio = lazy(() => import('./components/Portfolio'))
+const Solitaire = lazy(() => import('./components/Solitaire'))
+const Cestino = lazy(() => import('./components/Cestino'))
+const AntiVirus = lazy(() => import('./components/AntiVirus'))
+const Calendar = lazy(() => import('./components/Calendar'))
 
 // Carica dinamicamente tutti i file jpg dalla cartella sfondo per lo slideshow (lazy loading)
 const backgroundImages = import.meta.glob('./assets/sfondo/*.jpg', { eager: false }) as Record<string, () => Promise<{ default: string }>>
@@ -66,6 +78,12 @@ function App() {
     settings: false,
     paint: false,
     browser: false,
+    calculator: false,
+    portfolio: false,
+    solitaire: false,
+    cestino: false,
+    antivirus: false,
+    calendar: false,
   })
   const [minimizedWindows, setMinimizedWindows] = useState<Set<keyof typeof openWindows>>(new Set())
   const [desktopBackground, setDesktopBackground] = useState(defaultBackground)
@@ -164,6 +182,12 @@ function App() {
         linkedin: { x: 20, y: 340 },
         paint: { x: 100, y: 340 },
         browser: { x: 20, y: 420 },
+        calculator: { x: 100, y: 420 },
+        portfolio: { x: 20, y: 500 },
+        solitaire: { x: 100, y: 500 },
+        cestino: { x: 20, y: 580 },
+        antivirus: { x: 100, y: 580 },
+        calendar: { x: 20, y: 660 },
       }
     } else if (isTablet) {
       // Tablet: griglia 3 colonne
@@ -179,6 +203,12 @@ function App() {
         linkedin: { x: 230, y: 210 },
         paint: { x: 30, y: 300 },
         browser: { x: 130, y: 300 },
+        calculator: { x: 230, y: 300 },
+        portfolio: { x: 30, y: 390 },
+        solitaire: { x: 130, y: 390 },
+        cestino: { x: 230, y: 390 },
+        antivirus: { x: 30, y: 480 },
+        calendar: { x: 130, y: 480 },
       }
     } else {
       // Desktop: orizzontale
@@ -194,6 +224,12 @@ function App() {
         linkedin: { x: 910, y: 30 },
         paint: { x: 1020, y: 30 },
         browser: { x: 30, y: 130 },
+        calculator: { x: 140, y: 130 },
+        portfolio: { x: 250, y: 130 },
+        solitaire: { x: 360, y: 130 },
+        cestino: { x: window.innerWidth - 100, y: window.innerHeight - 150 },
+        antivirus: { x: 470, y: 130 },
+        calendar: { x: 580, y: 130 },
       }
     }
   }, [])
@@ -329,6 +365,12 @@ function App() {
       settings: false,
       paint: false,
       browser: false,
+      calculator: false,
+      portfolio: false,
+      solitaire: false,
+      cestino: false,
+      antivirus: false,
+      calendar: false,
     })
     setSelectedIcon(null)
     setDesktopBackground(defaultBackground)
@@ -542,6 +584,12 @@ function App() {
       settings: 'Impostazioni - Accessibilità',
       paint: 'Paint',
       browser: 'Mozilla Firefox',
+      calculator: 'Calcolatrice',
+      portfolio: 'Portfolio - Progetti',
+      solitaire: 'Solitario',
+      cestino: 'Cestino',
+      antivirus: 'Anti-Virus - Protezione Sistema',
+      calendar: 'Calendario',
     }
     return titles[window] || 'Finestra'
   }, [])
@@ -729,6 +777,70 @@ function App() {
           onPositionChange={(x, y) => handleIconPositionChange('browser', x, y)}
         />
       )}
+      {iconPositions.calculator && (
+        <DesktopIcon
+          icon={<img src={calculatorIcon} alt="Calcolatrice" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
+          label="Calcolatrice"
+          onClick={() => toggleWindow('calculator')}
+          x={iconPositions.calculator.x}
+          y={iconPositions.calculator.y}
+          isSelected={selectedIcon === 'calculator'}
+          onSelect={() => setSelectedIcon('calculator')}
+          onPositionChange={(x, y) => handleIconPositionChange('calculator', x, y)}
+        />
+      )}
+      {iconPositions.portfolio && (
+        <DesktopIcon
+          icon={<img src={portfolioIcon} alt="Portfolio" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
+          label="Portfolio"
+          onClick={() => toggleWindow('portfolio')}
+          x={iconPositions.portfolio.x}
+          y={iconPositions.portfolio.y}
+          isSelected={selectedIcon === 'portfolio'}
+          onSelect={() => setSelectedIcon('portfolio')}
+          onPositionChange={(x, y) => handleIconPositionChange('portfolio', x, y)}
+        />
+      )}
+      <DesktopIcon
+        icon={<img src={solitarioIcon} alt="Solitario" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
+        label="Solitario"
+        onClick={() => toggleWindow('solitario')}
+        x={iconPositions.solitario?.x || (window.innerWidth <= 480 ? 100 : window.innerWidth <= 768 ? 130 : 360)}
+        y={iconPositions.solitario?.y || (window.innerWidth <= 480 ? 500 : window.innerWidth <= 768 ? 390 : 130)}
+        isSelected={selectedIcon === 'solitario'}
+        onSelect={() => setSelectedIcon('solitario')}
+        onPositionChange={(x, y) => handleIconPositionChange('solitario', x, y)}
+      />
+      <DesktopIcon
+        icon={<img src={cestinoIcon} alt="Cestino" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
+        label="Cestino"
+        onClick={() => toggleWindow('cestino')}
+        x={iconPositions.cestino?.x || (window.innerWidth <= 480 ? 20 : window.innerWidth <= 768 ? 230 : window.innerWidth - 100)}
+        y={iconPositions.cestino?.y || (window.innerWidth <= 480 ? 580 : window.innerWidth <= 768 ? 390 : window.innerHeight - 150)}
+        isSelected={selectedIcon === 'cestino'}
+        onSelect={() => setSelectedIcon('cestino')}
+        onPositionChange={(x, y) => handleIconPositionChange('cestino', x, y)}
+      />
+      <DesktopIcon
+        icon={<img src={antivirusIcon} alt="Anti-Virus" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
+        label="Anti-Virus"
+        onClick={() => toggleWindow('antivirus')}
+        x={iconPositions.antivirus?.x || (window.innerWidth <= 480 ? 100 : window.innerWidth <= 768 ? 30 : 470)}
+        y={iconPositions.antivirus?.y || (window.innerWidth <= 480 ? 580 : window.innerWidth <= 768 ? 480 : 130)}
+        isSelected={selectedIcon === 'antivirus'}
+        onSelect={() => setSelectedIcon('antivirus')}
+        onPositionChange={(x, y) => handleIconPositionChange('antivirus', x, y)}
+      />
+      <DesktopIcon
+        icon={<img src={calendarIcon} alt="Calendario" style={{ width: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', height: window.innerWidth <= 480 ? '44px' : window.innerWidth <= 768 ? '50px' : '48px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />}
+        label="Calendario"
+        onClick={() => toggleWindow('calendar')}
+        x={iconPositions.calendar?.x || (window.innerWidth <= 480 ? 20 : window.innerWidth <= 768 ? 130 : 580)}
+        y={iconPositions.calendar?.y || (window.innerWidth <= 480 ? 660 : window.innerWidth <= 768 ? 480 : 130)}
+        isSelected={selectedIcon === 'calendar'}
+        onSelect={() => setSelectedIcon('calendar')}
+        onPositionChange={(x, y) => handleIconPositionChange('calendar', x, y)}
+      />
       {openWindows.about && !minimizedWindows.has('about') && (
         <Window
           title="Presentazione.txt"
@@ -912,6 +1024,60 @@ function App() {
           />
         </Suspense>
       )}
+      {openWindows.calculator && !minimizedWindows.has('calculator') && (
+        <Suspense fallback={<LoadingFallback />}>
+          <Calculator 
+            onClose={() => handleClose('calculator')}
+            onMinimize={() => handleMinimize('calculator')}
+            icon={<img src={calculatorIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
+          />
+        </Suspense>
+      )}
+      {openWindows.portfolio && !minimizedWindows.has('portfolio') && (
+        <Suspense fallback={<LoadingFallback />}>
+          <Portfolio 
+            onClose={() => handleClose('portfolio')}
+            onMinimize={() => handleMinimize('portfolio')}
+            icon={<img src={portfolioIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
+          />
+        </Suspense>
+      )}
+      {openWindows.solitario && !minimizedWindows.has('solitario') && (
+        <Suspense fallback={<LoadingFallback />}>
+          <Solitaire 
+            onClose={() => handleClose('solitario')}
+            onMinimize={() => handleMinimize('solitario')}
+            icon={<img src={solitarioIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
+          />
+        </Suspense>
+      )}
+      {openWindows.cestino && !minimizedWindows.has('cestino') && (
+        <Suspense fallback={<LoadingFallback />}>
+          <Cestino 
+            onClose={() => handleClose('cestino')}
+            onMinimize={() => handleMinimize('cestino')}
+            icon={<img src={cestinoIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
+          />
+        </Suspense>
+      )}
+      {openWindows.antivirus && !minimizedWindows.has('antivirus') && (
+        <Suspense fallback={<LoadingFallback />}>
+          <AntiVirus 
+            onClose={() => handleClose('antivirus')}
+            onMinimize={() => handleMinimize('antivirus')}
+            icon={<img src={antivirusIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
+          />
+        </Suspense>
+      )}
+      {openWindows.calendar && !minimizedWindows.has('calendar') && (
+        <Suspense fallback={<LoadingFallback />}>
+          <Calendar 
+            onClose={() => handleClose('calendar')}
+            onMinimize={() => handleMinimize('calendar')}
+            icon={<img src={calendarIcon} alt="" style={{ width: '16px', height: '16px', objectFit: 'contain', display: 'block', visibility: 'visible', opacity: 1 }} />}
+          />
+        </Suspense>
+      )}
 
       {/* Taskbar Windows 7 */}
       <div
@@ -963,7 +1129,7 @@ function App() {
             width: '45px',
             height: '40px',
             borderRadius: '0',
-            boxShadow: showStartMenu || openWindows.about || openWindows.personalInfo || openWindows.workExperience || openWindows.skills || openWindows.education || openWindows.certifications || openWindows.note || openWindows.documents || openWindows.images || openWindows.computer || openWindows.music || openWindows.settings || openWindows.paint || openWindows.browser
+            boxShadow: showStartMenu || openWindows.about || openWindows.personalInfo || openWindows.workExperience || openWindows.skills || openWindows.education || openWindows.certifications || openWindows.note || openWindows.documents || openWindows.images || openWindows.computer || openWindows.music || openWindows.settings || openWindows.paint || openWindows.browser || openWindows.calculator || openWindows.portfolio || openWindows.solitario || openWindows.cestino || openWindows.antivirus || openWindows.calendar
               ? 'inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 8px rgba(100, 150, 255, 0.4)'
               : 'inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.2)',
             transition: 'all 0.2s',
@@ -1599,6 +1765,282 @@ function App() {
             }} 
           />
         </button>
+        {openWindows.calculator && (
+          <button
+            className={`taskbar-button ${isWindowActive('calculator') ? 'is-active' : ''}`}
+            onClick={() => handleTaskbarClick('calculator')}
+            onMouseEnter={(e) => handleTaskbarButtonHover('calculator', e)}
+            onMouseLeave={handleTaskbarButtonLeave}
+            style={{
+              padding: '4px 12px',
+              fontSize: '11px',
+              border: 'none',
+              background: isWindowActive('calculator')
+                ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.3) 100%)'
+                : 'transparent',
+              backdropFilter: isWindowActive('calculator') ? 'blur(25px)' : 'none',
+              WebkitBackdropFilter: isWindowActive('calculator') ? 'blur(25px)' : 'none',
+              color: '#fff',
+              cursor: 'pointer',
+              fontWeight: isWindowActive('calculator') ? 'bold' : 'normal',
+              minWidth: 'auto',
+              width: 'auto',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              borderRadius: '2px',
+              margin: '2px',
+              boxShadow: isWindowActive('calculator')
+                ? 'inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 0 6px rgba(100, 150, 255, 0.3)'
+                : 'none',
+              transition: 'all 0.2s',
+            }}
+          >
+            <img 
+              src={calculatorIcon} 
+              alt="Calcolatrice" 
+              style={{ 
+                width: '18px', 
+                height: '18px',
+                objectFit: 'contain',
+                display: 'block',
+                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+              }} 
+            />
+          </button>
+        )}
+        {openWindows.portfolio && (
+          <button
+            className={`taskbar-button ${isWindowActive('portfolio') ? 'is-active' : ''}`}
+            onClick={() => handleTaskbarClick('portfolio')}
+            onMouseEnter={(e) => handleTaskbarButtonHover('portfolio', e)}
+            onMouseLeave={handleTaskbarButtonLeave}
+            style={{
+              padding: '4px 12px',
+              fontSize: '11px',
+              border: 'none',
+              background: isWindowActive('portfolio')
+                ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.3) 100%)'
+                : 'transparent',
+              backdropFilter: isWindowActive('portfolio') ? 'blur(25px)' : 'none',
+              WebkitBackdropFilter: isWindowActive('portfolio') ? 'blur(25px)' : 'none',
+              color: '#fff',
+              cursor: 'pointer',
+              fontWeight: isWindowActive('portfolio') ? 'bold' : 'normal',
+              minWidth: 'auto',
+              width: 'auto',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              borderRadius: '2px',
+              margin: '2px',
+              boxShadow: isWindowActive('portfolio')
+                ? 'inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 0 6px rgba(100, 150, 255, 0.3)'
+                : 'none',
+              transition: 'all 0.2s',
+            }}
+          >
+            <img 
+              src={portfolioIcon} 
+              alt="Portfolio" 
+              style={{ 
+                width: '18px', 
+                height: '18px',
+                objectFit: 'contain',
+                display: 'block',
+                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+              }} 
+            />
+          </button>
+        )}
+        {openWindows.solitario && (
+          <button
+            className={`taskbar-button ${isWindowActive('solitario') ? 'is-active' : ''}`}
+            onClick={() => handleTaskbarClick('solitario')}
+            onMouseEnter={(e) => handleTaskbarButtonHover('solitario', e)}
+            onMouseLeave={handleTaskbarButtonLeave}
+            style={{
+              padding: '4px 12px',
+              fontSize: '11px',
+              border: 'none',
+              background: isWindowActive('solitario')
+                ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.3) 100%)'
+                : 'transparent',
+              backdropFilter: isWindowActive('solitario') ? 'blur(25px)' : 'none',
+              WebkitBackdropFilter: isWindowActive('solitario') ? 'blur(25px)' : 'none',
+              color: '#fff',
+              cursor: 'pointer',
+              fontWeight: isWindowActive('solitario') ? 'bold' : 'normal',
+              minWidth: 'auto',
+              width: 'auto',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              borderRadius: '2px',
+              margin: '2px',
+              boxShadow: isWindowActive('solitario')
+                ? 'inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 0 6px rgba(100, 150, 255, 0.3)'
+                : 'none',
+              transition: 'all 0.2s',
+            }}
+          >
+            <img 
+              src={solitarioIcon} 
+              alt="Solitario" 
+              style={{ 
+                width: '18px', 
+                height: '18px',
+                objectFit: 'contain',
+                display: 'block',
+                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+              }} 
+            />
+          </button>
+        )}
+        {openWindows.cestino && (
+          <button
+            className={`taskbar-button ${isWindowActive('cestino') ? 'is-active' : ''}`}
+            onClick={() => handleTaskbarClick('cestino')}
+            onMouseEnter={(e) => handleTaskbarButtonHover('cestino', e)}
+            onMouseLeave={handleTaskbarButtonLeave}
+            style={{
+              padding: '4px 12px',
+              fontSize: '11px',
+              border: 'none',
+              background: isWindowActive('cestino')
+                ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.3) 100%)'
+                : 'transparent',
+              backdropFilter: isWindowActive('cestino') ? 'blur(25px)' : 'none',
+              WebkitBackdropFilter: isWindowActive('cestino') ? 'blur(25px)' : 'none',
+              color: '#fff',
+              cursor: 'pointer',
+              fontWeight: isWindowActive('cestino') ? 'bold' : 'normal',
+              minWidth: 'auto',
+              width: 'auto',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              borderRadius: '2px',
+              margin: '2px',
+              boxShadow: isWindowActive('cestino')
+                ? 'inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 0 6px rgba(100, 150, 255, 0.3)'
+                : 'none',
+              transition: 'all 0.2s',
+            }}
+          >
+            <img 
+              src={cestinoIcon} 
+              alt="Cestino" 
+              style={{ 
+                width: '18px', 
+                height: '18px',
+                objectFit: 'contain',
+                display: 'block',
+                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+              }} 
+            />
+          </button>
+        )}
+        {openWindows.antivirus && (
+          <button
+            className={`taskbar-button ${isWindowActive('antivirus') ? 'is-active' : ''}`}
+            onClick={() => handleTaskbarClick('antivirus')}
+            onMouseEnter={(e) => handleTaskbarButtonHover('antivirus', e)}
+            onMouseLeave={handleTaskbarButtonLeave}
+            style={{
+              padding: '4px 12px',
+              fontSize: '11px',
+              border: 'none',
+              background: isWindowActive('antivirus')
+                ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.3) 100%)'
+                : 'transparent',
+              backdropFilter: isWindowActive('antivirus') ? 'blur(25px)' : 'none',
+              WebkitBackdropFilter: isWindowActive('antivirus') ? 'blur(25px)' : 'none',
+              color: '#fff',
+              cursor: 'pointer',
+              fontWeight: isWindowActive('antivirus') ? 'bold' : 'normal',
+              minWidth: 'auto',
+              width: 'auto',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              borderRadius: '2px',
+              margin: '2px',
+              boxShadow: isWindowActive('antivirus')
+                ? 'inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 0 6px rgba(100, 150, 255, 0.3)'
+                : 'none',
+              transition: 'all 0.2s',
+            }}
+          >
+            <img 
+              src={antivirusIcon} 
+              alt="Anti-Virus" 
+              style={{ 
+                width: '18px', 
+                height: '18px',
+                objectFit: 'contain',
+                display: 'block',
+                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+              }} 
+            />
+          </button>
+        )}
+        {openWindows.calendar && (
+          <button
+            className={`taskbar-button ${isWindowActive('calendar') ? 'is-active' : ''}`}
+            onClick={() => handleTaskbarClick('calendar')}
+            onMouseEnter={(e) => handleTaskbarButtonHover('calendar', e)}
+            onMouseLeave={handleTaskbarButtonLeave}
+            style={{
+              padding: '4px 12px',
+              fontSize: '11px',
+              border: 'none',
+              background: isWindowActive('calendar')
+                ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.3) 100%)'
+                : 'transparent',
+              backdropFilter: isWindowActive('calendar') ? 'blur(25px)' : 'none',
+              WebkitBackdropFilter: isWindowActive('calendar') ? 'blur(25px)' : 'none',
+              color: '#fff',
+              cursor: 'pointer',
+              fontWeight: isWindowActive('calendar') ? 'bold' : 'normal',
+              minWidth: 'auto',
+              width: 'auto',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              borderRadius: '2px',
+              margin: '2px',
+              boxShadow: isWindowActive('calendar')
+                ? 'inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 0 6px rgba(100, 150, 255, 0.3)'
+                : 'none',
+              transition: 'all 0.2s',
+            }}
+          >
+            <img 
+              src={calendarIcon} 
+              alt="Calendario" 
+              style={{ 
+                width: '18px', 
+                height: '18px',
+                objectFit: 'contain',
+                display: 'block',
+                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+              }} 
+            />
+          </button>
+        )}
         <div style={{ flex: 1 }} />
         <div
           className="taskbar-clock"
