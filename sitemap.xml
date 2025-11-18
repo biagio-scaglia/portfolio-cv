@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   <url>
-    <loc>https://biagio-scaglia.github.io/portfolio-cv/</loc>
+    <loc>https://biagio-scaglia.github.io/</loc>
     <lastmod>2025-01-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://biagio-scaglia.github.io/src/assets/icone/portfolio.png</image:loc>
+      <image:title>Biagio Scaglia Portfolio</image:title>
+      <image:caption>Portfolio CV di Biagio Scaglia - Sviluppatore Software e UX/UI Designer</image:caption>
+    </image:image>
   </url>
 </urlset>
 
